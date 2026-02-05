@@ -1,7 +1,7 @@
 use rotalubat::Rotalubat;
-use strum::Display;
+use strum::{Display, EnumCount};
 
-#[derive(Clone, Copy, PartialEq, Eq, Default, Display, Rotalubat)]
+#[derive(Clone, Copy, PartialEq, Eq, Default, Display, Rotalubat, EnumCount)]
 #[rotalubat(mode = "clamp")]
 pub enum Screen {
     #[default]
@@ -11,34 +11,63 @@ pub enum Screen {
     #[strum(serialize = "0. The Elm Architecture")]
     Intro,
 
-    // Part 1: The Elm Architecture
+    // The Elm Architecture
     #[strum(serialize = "1. Model")]
     Model,
 
     #[strum(serialize = "2. View")]
     View,
 
-    #[strum(serialize = "3. Message")]
-    Message,
+    // Layout
+    #[strum(serialize = "3. Layout: Rows & Columns")]
+    LayoutRowCol,
 
-    #[strum(serialize = "4. Update")]
-    Update,
+    #[strum(serialize = "4. Layout: Container")]
+    LayoutContainer,
 
-    // Part 2: Iced Widgets
-    #[strum(serialize = "5. Widget: Button")]
+    #[strum(serialize = "5. Layout: Spacing & Alignment")]
+    LayoutSpacing,
+
+    // Widgets
+    #[strum(serialize = "6. Widget: Button")]
     Button,
 
-    #[strum(serialize = "6. Widget: Text Input")]
+    #[strum(serialize = "7. Widget: Text Input")]
     TextInput,
 
-    #[strum(serialize = "7. Tasks")]
+    // Back to Elm Architecture
+    #[strum(serialize = "8. Message")]
+    Message,
+
+    #[strum(serialize = "9. Update")]
+    Update,
+
+    #[strum(serialize = "10. Tasks")]
     Tasks,
 
-    #[strum(serialize = "8. Try It Out")]
+    #[strum(serialize = "11. Subscriptions")]
+    Subscriptions,
+
+    // Demo
+    #[strum(serialize = "12. Page Poker")]
     Interactive,
 
-    #[strum(serialize = "9. Quiz")]
+    // Quizzes
+    #[strum(serialize = "13. Quiz: Where Does Logic Live?")]
     Quiz,
+
+    #[strum(serialize = "14. Quiz: Async Operations")]
+    QuizHttp,
+
+    #[strum(serialize = "15. Quiz: Conditional UI")]
+    QuizButton,
+
+    #[strum(serialize = "16. Quiz: Validation Flow")]
+    QuizValidation,
+
+    // Recap
+    #[strum(serialize = "17. Recap")]
+    Recap,
 }
 
 impl Screen {
@@ -47,6 +76,6 @@ impl Screen {
     }
 
     pub fn is_last(&self) -> bool {
-        *self == Screen::Quiz
+        *self == Screen::Recap
     }
 }
