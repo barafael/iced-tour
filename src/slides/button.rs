@@ -5,14 +5,14 @@ use iced::{
 
 use crate::{App, Message, TEXT_SIZE};
 
-pub(crate) const MD_BUTTON: &str = r#"
+pub const MD_BUTTON: &str = r#"
 ```rust
 button("Get").on_press(Message::Action)
 ```
 "#;
 
 impl App {
-    pub(crate) fn view_button_screen(&self) -> Element<'_, Message> {
+    pub fn view_button_screen(&self) -> Element<'_, Message> {
         let click_text = if self.button_clicks == 0 {
             String::from("Click the button!")
         } else {

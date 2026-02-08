@@ -35,38 +35,47 @@ pub enum Screen {
     #[strum(serialize = "7. Widget: Text Input")]
     TextInput,
 
+    #[strum(serialize = "8. Styling Widgets")]
+    Theming,
+
     // Back to Elm Architecture
-    #[strum(serialize = "8. Message")]
+    #[strum(serialize = "9. Message")]
     Message,
 
-    #[strum(serialize = "9. Update")]
+    #[strum(serialize = "10. Variants as Constructors")]
+    Constructors,
+
+    #[strum(serialize = "11. Update")]
     Update,
 
-    #[strum(serialize = "10. Tasks")]
+    #[strum(serialize = "12. Tasks")]
     Tasks,
 
-    #[strum(serialize = "11. Subscriptions")]
+    #[strum(serialize = "13. Subscriptions")]
     Subscriptions,
 
     // Demo
-    #[strum(serialize = "12. Page Poker")]
+    #[strum(serialize = "14. Page Poker")]
     Interactive,
 
     // Quizzes
-    #[strum(serialize = "13. Quiz: Where Does Logic Live?")]
+    #[strum(serialize = "15. Quiz: Where Does Logic Live?")]
     Quiz,
 
-    #[strum(serialize = "14. Quiz: Async Operations")]
+    #[strum(serialize = "16. Quiz: Async Operations")]
     QuizHttp,
 
-    #[strum(serialize = "15. Quiz: Conditional UI")]
+    #[strum(serialize = "17. Quiz: Conditional UI")]
     QuizButton,
 
-    #[strum(serialize = "16. Quiz: Validation Flow")]
+    #[strum(serialize = "18. Quiz: Validation Flow")]
     QuizValidation,
 
     // Recap
-    #[strum(serialize = "17. Recap")]
+    #[strum(serialize = "19. Key Takeaways")]
+    Takeaways,
+
+    #[strum(serialize = "20. Recap")]
     Recap,
 }
 

@@ -5,7 +5,7 @@ use iced::{
 
 use crate::{App, Message, TEXT_SIZE};
 
-pub(crate) const MD_TEXT_INPUT: &str = r#"
+pub const MD_TEXT_INPUT: &str = r#"
 ```rust
 text_input("Enter URL (e.g. example.com)", &self.model.url)
     .on_input(Message::UrlChanged)
@@ -14,7 +14,7 @@ text_input("Enter URL (e.g. example.com)", &self.model.url)
 "#;
 
 impl App {
-    pub(crate) fn view_text_input_screen(&self) -> Element<'_, Message> {
+    pub fn view_text_input_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
                 text("The Text Input widget produces messages as the user types.").size(TEXT_SIZE),

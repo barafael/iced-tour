@@ -1506,15 +1506,12 @@ dependencies = [
 name = "iced-on-ice"
 version = "0.1.0"
 dependencies = [
- "humansize",
  "iced",
  "iced_anim",
  "lucide-icons",
+ "page-poker",
  "rand",
- "reqwest",
- "ron",
  "rotalubat",
- "serde",
  "strum",
 ]
 
@@ -2730,6 +2727,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36820e9051aca1014ddc75770aab4d68bc1e9e632f0f5627c4086bc216fb583b"
 dependencies = [
  "ttf-parser",
+]
+
+[[package]]
+name = "page-poker"
+version = "0.1.0"
+dependencies = [
+ "humansize",
+ "iced",
+ "reqwest",
+ "ron",
+ "serde",
+ "strum",
 ]
 
 [[package]]

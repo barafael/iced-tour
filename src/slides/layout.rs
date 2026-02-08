@@ -1,24 +1,21 @@
 use iced::{
-    widget::{column, container, row, scrollable, space, text},
     Color, Element,
+    widget::{button, column, container, row, scrollable, slider, space, text, text_input},
 };
 
-use crate::{App, Message, SUBTITLE_COLOR, TEXT_SIZE};
+use crate::{App, FIRA_MONO, Message, SUBTITLE_COLOR, TEXT_SIZE};
 
-pub(crate) const MD_ROW_COL: &str = r#"
+pub const MD_ROW_COL: &str = r#"
 ```rust
-// Horizontal layout
-row![widget_a, widget_b, widget_c]
-
 // Nested layouts
 column![
-    row![label, text_input],
-    row![cancel_btn, submit_btn],
+    row![text("Name"), text_input("Type here...", &self.input)],
+    row![button("Cancel"), button("Submit")],
 ]
 ```
 "#;
 
-pub(crate) const MD_CONTAINER: &str = r#"
+pub const MD_CONTAINER: &str = r#"
 ```rust
 // Wrap content for positioning and styling
 container(content)
@@ -29,7 +26,7 @@ container(content)
 ```
 "#;
 
-pub(crate) const MD_SPACING: &str = r#"
+pub const MD_SPACING: &str = r#"
 ```rust
 column![a, b, c]
     .spacing(10)           // Gap between children
@@ -39,10 +36,10 @@ column![a, b, c]
 "#;
 
 impl App {
-    pub(crate) fn view_layout_row_col_screen(&self) -> Element<'_, Message> {
+    pub fn view_layout_row_col_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Rows and columns are the building blocks of layout.").size(TEXT_SIZE),
+                text("The building blocks of layout.").size(TEXT_SIZE),
                 space().height(12),
                 self.md_container(&self.md_row_col),
                 space().height(20),
@@ -51,12 +48,17 @@ impl App {
                 container(
                     column![
                         row![
-                            text("Row 1, Col A"),
-                            text("Row 1, Col B"),
-                            text("Row 1, Col C"),
+                            text("Name"),
+                            text_input("Type here...", &self.demo_input)
+                                .on_input(Message::DemoInputChanged)
                         ]
-                        .spacing(20),
-                        row![text("Row 2, Col A"), text("Row 2, Col B")].spacing(20),
+                        .spacing(10)
+                        .align_y(iced::Alignment::Center),
+                        row![
+                            button("Cancel").on_press(Message::Noop),
+                            button("Submit").on_press(Message::Noop),
+                        ]
+                        .spacing(10),
                     ]
                     .spacing(10)
                 )
@@ -69,7 +71,7 @@ impl App {
         .into()
     }
 
-    pub(crate) fn view_layout_container_screen(&self) -> Element<'_, Message> {
+    pub fn view_layout_container_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
                 text("Container wraps content for positioning and styling.").size(TEXT_SIZE),
@@ -92,37 +94,43 @@ impl App {
         .into()
     }
 
-    pub(crate) fn view_layout_spacing_screen(&self) -> Element<'_, Message> {
-        let row: Element<'_, Message> = row![
-            container(
-                column![text("A"), text("B"), text("C")]
-                    .spacing(5)
-                    .align_x(iced::Alignment::Start),
-            )
-            .padding(10)
-            .style(container::rounded_box),
-            container(
-                column![text("A"), text("B"), text("C")]
-                    .spacing(15)
-                    .align_x(iced::Alignment::Center),
-            )
-            .padding(10)
-            .style(container::rounded_box),
-            container(
-                column![text("A"), text("B"), text("C")]
-                    .spacing(25)
-                    .align_x(iced::Alignment::End),
-            )
-            .padding(10)
-            .style(container::rounded_box),
-        ]
-        .spacing(20)
+    pub fn view_layout_spacing_screen(&self) -> Element<'_, Message> {
+        let sp = self.demo_spacing;
+        let pd = self.demo_padding;
+
+        // Interactive preview driven by sliders
+        let preview: Element<'_, Message> = container(
+            column![text("A"), text("B"), text("C")]
+                .spacing(sp)
+                .align_x(iced::Alignment::Center),
+        )
+        .padding(pd)
+        .style(container::rounded_box)
         .into();
-        let row = if self.shift_held {
-            row.explain(Color::from_rgb(0.4, 0.2, 0.8))
+
+        let preview = if self.shift_held {
+            preview.explain(Color::from_rgb(0.4, 0.2, 0.8))
         } else {
-            row
+            preview
         };
+
+        let spacing_slider = row![
+            text(format!(".spacing({:.0})", sp))
+                .size(16)
+                .font(FIRA_MONO),
+            slider(0.0..=40.0, sp, Message::DemoSpacingChanged).width(200),
+        ]
+        .spacing(12)
+        .align_y(iced::Alignment::Center);
+
+        let padding_slider = row![
+            text(format!(".padding({:.0})", pd))
+                .size(16)
+                .font(FIRA_MONO),
+            slider(0.0..=40.0, pd, Message::DemoPaddingChanged).width(200),
+        ]
+        .spacing(12)
+        .align_y(iced::Alignment::Center);
 
         scrollable(
             column![
@@ -131,11 +139,12 @@ impl App {
                 space().height(12),
                 self.md_container(&self.md_spacing),
                 space().height(20),
-                text("Live example:").size(TEXT_SIZE).color(SUBTITLE_COLOR),
-                space().height(10),
-                row,
+                row![spacing_slider, padding_slider].spacing(20),
+                space().height(12),
+                preview,
+                space().height(8),
                 text("hint: press shift")
-                    .size(TEXT_SIZE)
+                    .size(TEXT_SIZE - 4)
                     .color(SUBTITLE_COLOR),
             ]
             .spacing(8)

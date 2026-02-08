@@ -1,12 +1,13 @@
+[workspace]
+members = [".", "page-poker"]
+
 [package]
 name = "iced-on-ice"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ron = "0.12"
-serde = { version = "1", features = ["derive"] }
-humansize = "2"
+page-poker = { path = "page-poker" }
 iced = { version = "0.14", features = [
   "canvas",
   "highlighter",
@@ -18,7 +19,6 @@ iced = { version = "0.14", features = [
 ] }
 iced_anim = { version = "0.3", features = ["derive"] }
 rand = "0.9"
-reqwest = "0.13"
 lucide-icons = { version = "0.563.0", features = ["iced"] }
 strum = { version = "0.27", features = ["derive"] }
 rotalubat = "1.0.3"

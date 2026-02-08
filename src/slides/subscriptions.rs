@@ -1,11 +1,11 @@
 use iced::{
-    widget::{canvas, column, scrollable, space, stack, text},
+    widget::{button, column, scrollable, space, text},
     Element,
 };
 
-use crate::{chaos, App, Message, SUBTITLE_COLOR, TEXT_SIZE};
+use crate::{App, Message, SUBTITLE_COLOR, TEXT_SIZE};
 
-pub(crate) const MD_SUBSCRIPTIONS: &str = r#"
+pub const MD_SUBSCRIPTIONS: &str = r#"
 ```rust
 fn subscription(&self) -> Subscription<Message> {
     event::listen_with(|event, _, _| match event {
@@ -19,8 +19,8 @@ fn subscription(&self) -> Subscription<Message> {
 "#;
 
 impl App {
-    pub(crate) fn view_subscriptions_screen(&self) -> Element<'_, Message> {
-        let content = scrollable(
+    pub fn view_subscriptions_screen(&self) -> Element<'_, Message> {
+        scrollable(
             column![
                 text("Subscriptions let your app react to external events.").size(TEXT_SIZE),
                 space().height(12),
@@ -39,17 +39,12 @@ impl App {
                 space().height(16),
                 text("Other common uses: timers, window events, WebSocket messages.")
                     .size(TEXT_SIZE),
+                space().height(12),
+                button("🚨 Panic!").on_press(Message::PanicChaos),
             ]
             .spacing(8)
             .padding(30),
-        );
-
-        let chaos_overlay = canvas(chaos::ChaosOverlay {
-            circles: &self.chaos_circles,
-        })
-        .width(iced::Fill)
-        .height(iced::Fill);
-
-        stack![content, chaos_overlay].into()
+        )
+        .into()
     }
 }

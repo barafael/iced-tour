@@ -7,7 +7,7 @@ use lucide_icons::iced::icon_keyboard;
 use crate::{App, Message, ICED_LOGO, ORANGE, SUBTITLE_COLOR};
 
 impl App {
-    pub(crate) fn view_title_screen(&self) -> Element<'_, Message> {
+    pub fn view_title_screen(&self) -> Element<'_, Message> {
         container(
             column![
                 svg(svg::Handle::from_memory(ICED_LOGO))

@@ -1,11 +1,11 @@
 use iced::{
-    widget::{column, scrollable, space, text},
     Element,
+    widget::{column, scrollable, space, text},
 };
 
 use crate::{App, Message, TEXT_SIZE};
 
-pub(crate) const MD_UPDATE: &str = r#"
+pub const MD_UPDATE: &str = r#"
 ```rust
 fn update(&mut self, message: Message) {
     match message {
@@ -20,7 +20,7 @@ fn update(&mut self, message: Message) {
 "#;
 
 impl App {
-    pub(crate) fn view_update_screen(&self) -> Element<'_, Message> {
+    pub fn view_update_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
                 text("Update modifies state based on messages.").size(TEXT_SIZE),

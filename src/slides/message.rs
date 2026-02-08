@@ -5,7 +5,7 @@ use iced::{
 
 use crate::{App, Message, TEXT_SIZE};
 
-pub(crate) const MD_MESSAGE: &str = r#"
+pub const MD_MESSAGE: &str = r#"
 ```rust
 enum Message {
     UrlChanged(String),
@@ -18,7 +18,7 @@ enum Message {
 "#;
 
 impl App {
-    pub(crate) fn view_message_screen(&self) -> Element<'_, Message> {
+    pub fn view_message_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
                 text("Messages describe user actions or system events.").size(TEXT_SIZE),

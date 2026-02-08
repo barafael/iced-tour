@@ -1,0 +1,12 @@
+[package]
+name = "page-poker"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+iced = { version = "0.14", features = ["tokio"] }
+ron = "0.12"
+serde = { version = "1", features = ["derive"] }
+humansize = "2"
+reqwest = "0.13"
+strum = { version = "0.27", features = ["derive"] }

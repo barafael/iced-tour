@@ -5,7 +5,7 @@ use iced::{
 
 use crate::{App, Message, TEXT_SIZE};
 
-pub(crate) const MD_MODEL: &str = r#"
+pub const MD_MODEL: &str = r#"
 ```rust
 enum Mode {
     Title,
@@ -22,7 +22,7 @@ struct UrlAnalyzer {
 "#;
 
 impl App {
-    pub(crate) fn view_model_screen(&self) -> Element<'_, Message> {
+    pub fn view_model_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
                 text("The Model holds application state.").size(TEXT_SIZE),

@@ -1,10 +1,88 @@
 use iced::{
+    Border, Color, Shadow, Theme,
     widget::{button, column, container, row, space, text},
     Element,
 };
 use lucide_icons::iced::{icon_circle_check, icon_circle_x};
 
-use crate::{App, CORRECT_COLOR, INCORRECT_COLOR, Message, ORANGE, SUBTITLE_COLOR};
+use crate::{App, CORRECT_COLOR, FIRA_MONO, INCORRECT_COLOR, Message, ORANGE, SUBTITLE_COLOR};
+
+// WWM dark navy colors
+const WWM_BG: Color = Color::from_rgb(0.08, 0.12, 0.22);
+const WWM_BG_HOVER: Color = Color::from_rgb(0.14, 0.20, 0.35);
+const WWM_BG_DIMMED: Color = Color::from_rgb(0.06, 0.08, 0.14);
+const WWM_BORDER: Color = Color::from_rgb(0.25, 0.35, 0.55);
+
+fn wwm_style(
+    is_selected: bool,
+    is_correct: bool,
+    answered: bool,
+) -> impl Fn(&Theme, button::Status) -> button::Style {
+    move |_theme, status| {
+        let border = Border {
+            width: 1.5,
+            radius: 6.0.into(),
+            color: WWM_BORDER,
+        };
+
+        if !answered {
+            // Not answered yet — normal WWM style
+            let bg = match status {
+                button::Status::Hovered => WWM_BG_HOVER,
+                button::Status::Pressed => WWM_BG,
+                _ => WWM_BG,
+            };
+            button::Style {
+                background: Some(bg.into()),
+                text_color: Color::WHITE,
+                border,
+                shadow: Shadow::default(),
+                snap: false,
+            }
+        } else if is_selected && is_correct {
+            // Picked this, and it's correct → green
+            button::Style {
+                background: Some(CORRECT_COLOR.into()),
+                text_color: Color::WHITE,
+                border: Border { color: CORRECT_COLOR, ..border },
+                shadow: Shadow::default(),
+                snap: false,
+            }
+        } else if is_selected && !is_correct {
+            // Picked this, but it's wrong → red
+            button::Style {
+                background: Some(INCORRECT_COLOR.into()),
+                text_color: Color::WHITE,
+                border: Border { color: INCORRECT_COLOR, ..border },
+                shadow: Shadow::default(),
+                snap: false,
+            }
+        } else if !is_selected && is_correct {
+            // Not picked, but this is the correct answer → reveal green
+            button::Style {
+                background: Some(Color::from_rgba(0.18, 0.65, 0.35, 0.7).into()),
+                text_color: Color::WHITE,
+                border: Border { color: CORRECT_COLOR, ..border },
+                shadow: Shadow::default(),
+                snap: false,
+            }
+        } else {
+            // Not picked, not correct → dim
+            button::Style {
+                background: Some(WWM_BG_DIMMED.into()),
+                text_color: Color::from_rgba(1.0, 1.0, 1.0, 0.4),
+                border: Border {
+                    color: Color::from_rgba(0.25, 0.35, 0.55, 0.3),
+                    ..border
+                },
+                shadow: Shadow::default(),
+                snap: false,
+            }
+        }
+    }
+}
+
+const LETTERS: [&str; 4] = ["A:", "B:", "C:", "D:"];
 
 impl App {
     fn view_quiz<'a>(
@@ -13,8 +91,56 @@ impl App {
         answer: Option<u8>,
         feedbacks: &'a [(u8, &'a str, bool)],
     ) -> Element<'a, Message> {
+        assert_eq!(options.len(), 4, "WWM quiz requires exactly 4 options");
+
+        // Find which index is correct
+        let correct_idx = feedbacks
+            .iter()
+            .find(|(_, _, c)| *c)
+            .map(|(i, _, _)| *i);
+
+        // Build 4 styled buttons
+        let buttons: Vec<Element<'a, Message>> = options
+            .iter()
+            .enumerate()
+            .map(|(i, (label, msg))| {
+                let idx = i as u8;
+                let is_selected = answer == Some(idx);
+                let is_correct = correct_idx == Some(idx);
+                let answered = answer.is_some();
+
+                let content = row![
+                    text(LETTERS[i]).size(18).font(FIRA_MONO).color(ORANGE),
+                    text(*label).size(18).color(Color::WHITE),
+                ]
+                .spacing(10)
+                .align_y(iced::Alignment::Center);
+
+                button(content)
+                    .on_press(msg.clone())
+                    .width(iced::Fill)
+                    .padding([12, 20])
+                    .style(wwm_style(is_selected, is_correct, answered))
+                    .into()
+            })
+            .collect();
+
+        // 2×2 grid
+        let mut buttons = buttons.into_iter();
+        let a = buttons.next().unwrap();
+        let b = buttons.next().unwrap();
+        let c = buttons.next().unwrap();
+        let d = buttons.next().unwrap();
+
+        let grid = column![
+            row![a, b].spacing(16),
+            row![c, d].spacing(16),
+        ]
+        .spacing(16);
+
+        // Feedback text below
         let feedback: Element<'_, Message> = match answer {
-            None => text("Select an answer above")
+            None => text("Select an answer")
                 .size(16)
                 .color(SUBTITLE_COLOR)
                 .into(),
@@ -30,7 +156,7 @@ impl App {
                     } else {
                         INCORRECT_COLOR
                     };
-                    row![icon, text(*fb).size(18).color(color)]
+                    row![icon, text(*fb).size(16).color(color)]
                         .spacing(8)
                         .align_y(iced::Alignment::Center)
                         .into()
@@ -40,24 +166,16 @@ impl App {
             }
         };
 
-        let option_buttons = column(
-            options
-                .iter()
-                .map(|(label, msg)| button(*label).on_press(msg.clone()).into())
-                .collect::<Vec<_>>(),
-        )
-        .spacing(12);
-
         container(
             column![
-                text(question).size(32).color(ORANGE),
+                text(question).size(28).color(ORANGE),
                 space().height(30),
-                option_buttons,
-                space().height(25),
+                grid,
+                space().height(20),
                 feedback,
             ]
             .spacing(10)
-            .align_x(iced::Alignment::Center),
+            .padding(20),
         )
         .width(iced::Fill)
         .height(iced::Fill)
@@ -66,14 +184,14 @@ impl App {
         .into()
     }
 
-    pub(crate) fn view_quiz_screen(&self) -> Element<'_, Message> {
+    pub fn view_quiz_screen(&self) -> Element<'_, Message> {
         Self::view_quiz(
             "Where should validation of a text input happen?",
             &[
-                ("A) In the View", Message::QuizAnswer(0)),
-                ("B) In the Message", Message::QuizAnswer(1)),
-                ("C) In the Update", Message::QuizAnswer(2)),
-                ("D) In the Model", Message::QuizAnswer(3)),
+                ("In the View", Message::QuizAnswer(0)),
+                ("In the Message", Message::QuizAnswer(1)),
+                ("In the Update", Message::QuizAnswer(2)),
+                ("In the Model", Message::QuizAnswer(3)),
             ],
             self.quiz_answer,
             &[
@@ -85,14 +203,14 @@ impl App {
         )
     }
 
-    pub(crate) fn view_quiz_http_screen(&self) -> Element<'_, Message> {
+    pub fn view_quiz_http_screen(&self) -> Element<'_, Message> {
         Self::view_quiz(
             "Where should you make an HTTP request?",
             &[
-                ("A) In the View", Message::QuizHttpAnswer(0)),
-                ("B) In the Message", Message::QuizHttpAnswer(1)),
-                ("C) In a Task returned from Update", Message::QuizHttpAnswer(2)),
-                ("D) In the Model", Message::QuizHttpAnswer(3)),
+                ("In the View", Message::QuizHttpAnswer(0)),
+                ("In the Message", Message::QuizHttpAnswer(1)),
+                ("In a Task from Update", Message::QuizHttpAnswer(2)),
+                ("In the Model", Message::QuizHttpAnswer(3)),
             ],
             self.quiz_http_answer,
             &[
@@ -104,36 +222,40 @@ impl App {
         )
     }
 
-    pub(crate) fn view_quiz_button_screen(&self) -> Element<'_, Message> {
+    pub fn view_quiz_button_screen(&self) -> Element<'_, Message> {
         Self::view_quiz(
             "How do you disable a button when a field is empty?",
             &[
-                ("A) View checks the condition with conditional on_press", Message::QuizButtonAnswer(0)),
-                ("B) Update sets a flag in the Model, View reads it", Message::QuizButtonAnswer(1)),
-                ("C) Send a DisableButton message", Message::QuizButtonAnswer(2)),
+                ("Conditional on_press in View", Message::QuizButtonAnswer(0)),
+                ("Flag in Model, View reads it", Message::QuizButtonAnswer(1)),
+                ("Send a DisableButton message", Message::QuizButtonAnswer(2)),
+                ("Add a disabled bool to Model", Message::QuizButtonAnswer(3)),
             ],
             self.quiz_button_answer,
             &[
-                (0, "Correct! For simple conditions, the View can check directly with conditional on_press.", true),
-                (1, "Correct! For complex logic, Update can set a flag in the Model that the View reads.", true),
-                (2, "Not quite. Messages don't control UI state — they describe events.", false),
+                (0, "Correct! The View can check the condition directly and conditionally call on_press.", true),
+                (1, "Also correct! For complex logic, Update can set a flag that the View reads.", true),
+                (2, "Not quite. Messages describe events, not UI commands.", false),
+                (3, "Not quite. A separate flag is unnecessary — the View can derive disabled state from existing data.", false),
             ],
         )
     }
 
-    pub(crate) fn view_quiz_validation_screen(&self) -> Element<'_, Message> {
+    pub fn view_quiz_validation_screen(&self) -> Element<'_, Message> {
         Self::view_quiz(
             "How does input validation with error display work?",
             &[
-                ("A) Update validates, stores error in Model, View displays it", Message::QuizValidationAnswer(0)),
-                ("B) View validates and shows error directly", Message::QuizValidationAnswer(1)),
-                ("C) Update validates and shows error directly", Message::QuizValidationAnswer(2)),
+                ("Update → Model → View", Message::QuizValidationAnswer(0)),
+                ("View validates directly", Message::QuizValidationAnswer(1)),
+                ("Update shows error directly", Message::QuizValidationAnswer(2)),
+                ("Message sends ValidateInput", Message::QuizValidationAnswer(3)),
             ],
             self.quiz_validation_answer,
             &[
-                (0, "Correct! Update validates and stores errors in the Model. The View reads those errors and displays them. Messages carry the input data.", true),
-                (1, "Not quite. The View shouldn't contain validation logic — it only renders based on Model state.", false),
-                (2, "Not quite. While Update does the validation, the error must be stored in the Model for the View to display it.", false),
+                (0, "Correct! Update validates, stores errors in Model, View displays them.", true),
+                (1, "Not quite. The View shouldn't contain validation logic — it only renders.", false),
+                (2, "Not quite. Update validates, but the error must be stored in the Model for View to display.", false),
+                (3, "Not quite. Messages carry data about what happened, not commands for what to do.", false),
             ],
         )
     }

@@ -5,7 +5,7 @@ use iced::{
 
 use crate::{App, Message, TEXT_SIZE};
 
-pub(crate) const MD_TASKS: &str = r#"
+pub const MD_TASKS: &str = r#"
 ```rust
 fn update(&mut self, message: Message) -> Task<Message> {
     ...
@@ -21,7 +21,7 @@ fn update(&mut self, message: Message) -> Task<Message> {
 "#;
 
 impl App {
-    pub(crate) fn view_tasks_screen(&self) -> Element<'_, Message> {
+    pub fn view_tasks_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
                 text("The update function may produce a Task for async background operations.")

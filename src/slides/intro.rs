@@ -1,11 +1,11 @@
 use iced::{
-    widget::{column, scrollable, space, svg},
     Element, Padding,
+    widget::{column, scrollable, space, svg},
 };
 
 use crate::{App, ELM_CIRCLE_OF_LIFE, Message};
 
-pub(crate) const MD_INTRO: &str = r#"
+pub const MD_INTRO: &str = r#"
 The **Elm Architecture** is a pattern for structuring interactive applications.
 
 It separates concerns into four distinct parts:
@@ -17,12 +17,12 @@ It separates concerns into four distinct parts:
 "#;
 
 impl App {
-    pub(crate) fn view_intro_screen(&self) -> Element<'_, Message> {
+    pub fn view_intro_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
                 self.md_container(&self.md_intro),
                 space().height(30),
-                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(260),
+                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(220),
                 space().height(30),
             ]
             .align_x(iced::Alignment::Center)
