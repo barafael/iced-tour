@@ -21,14 +21,14 @@ impl App {
     pub fn view_message_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Messages describe user actions or system events.").size(TEXT_SIZE),
-                space().height(8),
+                text("Messages describe user actions or system events.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 self.md_container(&self.md_message),
-                space().height(12),
-                text("Messages are produced by the view.").size(TEXT_SIZE)
+                space().height(self.sp(12.0)),
+                text("Messages are produced by the view.").size(self.sz(TEXT_SIZE))
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

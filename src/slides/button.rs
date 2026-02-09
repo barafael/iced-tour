@@ -25,19 +25,19 @@ impl App {
 
         scrollable(
             column![
-                text("The Button widget produces messages when clicked.").size(TEXT_SIZE),
-                space().height(8),
+                text("The Button widget produces messages when clicked.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 self.md_container(&self.md_button),
-                space().height(20),
+                space().height(self.sp(20.0)),
                 row![
                     button("Get").on_press(Message::ButtonClicked),
-                    text(click_text).size(TEXT_SIZE),
+                    text(click_text).size(self.sz(TEXT_SIZE)),
                 ]
-                .spacing(15)
+                .spacing(self.sp(15.0))
                 .align_y(iced::Alignment::Center),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

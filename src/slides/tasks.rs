@@ -25,20 +25,20 @@ impl App {
         scrollable(
             column![
                 text("The update function may produce a Task for async background operations.")
-                    .size(TEXT_SIZE),
-                space().height(8),
+                    .size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 self.md_container(&self.md_tasks),
-                space().height(12),
+                space().height(self.sp(12.0)),
                 text("Task::perform takes an async function and a message constructor.")
-                    .size(TEXT_SIZE),
-                space().height(8),
+                    .size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 text(
                     "When the async work completes, the result is usually wrapped in the message."
                 )
-                .size(TEXT_SIZE),
+                .size(self.sz(TEXT_SIZE)),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

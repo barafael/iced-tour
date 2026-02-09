@@ -20,7 +20,19 @@
       "Bash(cargo doc:*)",
       "Bash(cargo metadata:*)",
       "Bash(python3:*)",
-      "Bash(cargo check:*)"
+      "Bash(cargo check:*)",
+      "WebSearch",
+      "Bash(cd:*)",
+      "Bash(git -C C:workspacesourcesiced-on-ice status)",
+      "Bash(cmd /c \"echo hello\")",
+      "Bash(/bin/echo:*)",
+      "Bash(git -C \"C:/workspace/sources/iced-on-ice\" status)",
+      "Bash(git -C \"C:\\\\workspace\\\\sources\\\\iced-on-ice\" status)",
+      "Bash(git -C C:/workspace/sources/iced-on-ice status)",
+      "Bash(echo:*)",
+      "Bash(cargo:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(/usr/bin/env bash -c \"echo hello\")"
     ]
   }
 }

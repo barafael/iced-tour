@@ -42,26 +42,26 @@ impl App {
     pub fn view_theming_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Every widget has a .style() method that takes a closure.").size(TEXT_SIZE),
-                space().height(12),
+                text("Every widget has a .style() method that takes a closure.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 self.md_container(&self.md_theme),
-                space().height(12),
+                space().height(self.sp(12.0)),
                 text("The closure receives the current Theme and widget Status (Active, Hovered, Pressed, …).")
-                    .size(TEXT_SIZE),
-                space().height(8),
+                    .size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 text("Return a Style struct — background, text_color, border, shadow, …")
-                    .size(TEXT_SIZE),
-                space().height(16),
+                    .size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(16.0)),
                 text("Iced also ships with built-in themes (GruvboxLight, Dracula, Nord, …) that you can switch at runtime.")
-                    .size(TEXT_SIZE - 2)
+                    .size(self.sz(TEXT_SIZE - 2))
                     .color(SUBTITLE_COLOR),
-                space().height(4),
+                space().height(self.sp(4.0)),
                 text("hint: hold Ctrl to try it yourself")
-                    .size(TEXT_SIZE - 4)
+                    .size(self.sz(TEXT_SIZE - 4))
                     .color(SUBTITLE_COLOR),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }
@@ -69,16 +69,16 @@ impl App {
     pub fn view_view_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The View visualizes the application state.").size(TEXT_SIZE),
-                space().height(12),
+                text("The View visualizes the application state.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 self.md_container(&self.md_view),
-                space().height(12),
-                text("Notice the method signature: &self (immutable borrow).").size(TEXT_SIZE),
-                space().height(8),
-                text("The View can read state but never modify it.").size(TEXT_SIZE),
+                space().height(self.sp(12.0)),
+                text("Notice the method signature: &self (immutable borrow).").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
+                text("The View can read state but never modify it.").size(self.sz(TEXT_SIZE)),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

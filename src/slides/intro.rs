@@ -21,12 +21,12 @@ impl App {
         scrollable(
             column![
                 self.md_container(&self.md_intro),
-                space().height(30),
-                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(220),
-                space().height(30),
+                space().height(self.sp(30.0)),
+                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(self.sp(220.0)),
+                space().height(self.sp(30.0)),
             ]
             .align_x(iced::Alignment::Center)
-            .padding(Padding::new(20.0).left(40.0).right(40.0)),
+            .padding(Padding::new(self.sp(20.0)).left(self.sp(40.0)).right(self.sp(40.0))),
         )
         .into()
     }

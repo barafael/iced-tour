@@ -23,14 +23,14 @@ impl App {
     pub fn view_update_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Update modifies state based on messages.").size(TEXT_SIZE),
-                space().height(8),
+                text("Update modifies state based on messages.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 self.md_container(&self.md_update),
-                space().height(12),
-                text("Notice the method signature! (&mut)").size(TEXT_SIZE),
+                space().height(self.sp(12.0)),
+                text("Notice the method signature! (&mut)").size(self.sz(TEXT_SIZE)),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

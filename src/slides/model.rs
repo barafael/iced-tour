@@ -25,14 +25,14 @@ impl App {
     pub fn view_model_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The Model holds application state.").size(TEXT_SIZE),
-                space().height(12),
+                text("The Model holds application state.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 self.md_container(&self.md_model),
-                space().height(12),
-                text("Notice: completely UI-agnostic.").size(TEXT_SIZE),
+                space().height(self.sp(12.0)),
+                text("Notice: completely UI-agnostic.").size(self.sz(TEXT_SIZE)),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

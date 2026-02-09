@@ -17,19 +17,19 @@ impl App {
     pub fn view_text_input_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The Text Input widget produces messages as the user types.").size(TEXT_SIZE),
-                space().height(8),
+                text("The Text Input widget produces messages as the user types.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 self.md_container(&self.md_text_input),
-                space().height(20),
+                space().height(self.sp(20.0)),
                 text_input("Enter URL (e.g. example.com)", &self.demo_input)
                     .on_input(Message::DemoInputChanged)
                     .on_submit(Message::DemoInputSubmitted),
-                space().height(12),
-                text!("Input Changed messages: {}", self.input_changes).size(TEXT_SIZE),
-                text!("Input Submitted messages: {}", self.input_submits).size(TEXT_SIZE),
+                space().height(self.sp(12.0)),
+                text!("Input Changed messages: {}", self.input_changes).size(self.sz(TEXT_SIZE)),
+                text!("Input Submitted messages: {}", self.input_submits).size(self.sz(TEXT_SIZE)),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

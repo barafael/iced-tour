@@ -22,28 +22,28 @@ impl App {
     pub fn view_subscriptions_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Subscriptions let your app react to external events.").size(TEXT_SIZE),
-                space().height(12),
+                text("Subscriptions let your app react to external events.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 self.md_container(&self.md_subscriptions),
-                space().height(16),
-                space().height(8),
+                space().height(self.sp(16.0)),
+                space().height(self.sp(8.0)),
                 text("  • Arrow Right → next slide")
-                    .size(TEXT_SIZE - 4)
+                    .size(self.sz(TEXT_SIZE - 4))
                     .color(SUBTITLE_COLOR),
                 text("  • Arrow Left → previous slide")
-                    .size(TEXT_SIZE - 4)
+                    .size(self.sz(TEXT_SIZE - 4))
                     .color(SUBTITLE_COLOR),
                 text("  • Ctrl → show theme picker")
-                    .size(TEXT_SIZE - 4)
+                    .size(self.sz(TEXT_SIZE - 4))
                     .color(SUBTITLE_COLOR),
-                space().height(16),
+                space().height(self.sp(16.0)),
                 text("Other common uses: timers, window events, WebSocket messages.")
-                    .size(TEXT_SIZE),
-                space().height(12),
+                    .size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 button("🚨 Panic!").on_press(Message::PanicChaos),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

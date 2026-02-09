@@ -58,24 +58,28 @@ pub enum Screen {
     #[strum(serialize = "14. Page Poker")]
     Interactive,
 
+    // Community
+    #[strum(serialize = "15. Community Widgets")]
+    CommunityWidgets,
+
     // Quizzes
-    #[strum(serialize = "15. Quiz: Where Does Logic Live?")]
+    #[strum(serialize = "16. Quiz: Where Does Logic Live?")]
     Quiz,
 
-    #[strum(serialize = "16. Quiz: Async Operations")]
+    #[strum(serialize = "17. Quiz: Async Operations")]
     QuizHttp,
 
-    #[strum(serialize = "17. Quiz: Conditional UI")]
+    #[strum(serialize = "18. Quiz: Conditional UI")]
     QuizButton,
 
-    #[strum(serialize = "18. Quiz: Validation Flow")]
+    #[strum(serialize = "19. Quiz: Validation Flow")]
     QuizValidation,
 
     // Recap
-    #[strum(serialize = "19. Key Takeaways")]
+    #[strum(serialize = "20. Key Takeaways")]
     Takeaways,
 
-    #[strum(serialize = "20. Recap")]
+    #[strum(serialize = "21. Recap")]
     Recap,
 }
 

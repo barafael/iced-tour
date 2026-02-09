@@ -22,6 +22,7 @@ rand = "0.9"
 lucide-icons = { version = "0.563.0", features = ["iced"] }
 strum = { version = "0.27", features = ["derive"] }
 rotalubat = "1.0.3"
+iced_term = "0.7.0"
 
 [profile.release]
 opt-level = "s"

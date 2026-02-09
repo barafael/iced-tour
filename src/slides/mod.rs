@@ -1,4 +1,5 @@
 pub mod button;
+pub mod community_widgets;
 pub mod constructors;
 pub mod interactive;
 pub mod intro;

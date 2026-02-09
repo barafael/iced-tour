@@ -26,18 +26,18 @@ impl App {
     pub fn view_constructors_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Enum variants with data are enum constructors.").size(TEXT_SIZE),
-                space().height(8),
+                text("Enum variants with data are enum constructors.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(8.0)),
                 self.md_container(&self.md_constructors),
-                space().height(16),
+                space().height(self.sp(16.0)),
                 text("Widgets pass their state into these constructors:")
-                    .size(TEXT_SIZE)
+                    .size(self.sz(TEXT_SIZE))
                     .color(SUBTITLE_COLOR),
-                space().height(8),
+                space().height(self.sp(8.0)),
                 self.md_container(&self.md_widget_messages),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }

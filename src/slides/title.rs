@@ -11,22 +11,22 @@ impl App {
         container(
             column![
                 svg(svg::Handle::from_memory(ICED_LOGO))
-                    .width(96)
-                    .height(96),
-                space().height(30),
-                text("Discover Iced").size(56).color(ORANGE),
-                space().height(16),
+                    .width(self.sp(96.0))
+                    .height(self.sp(96.0)),
+                space().height(self.sp(30.0)),
+                text("Discover Iced").size(self.sz(56)).color(ORANGE),
+                space().height(self.sp(16.0)),
                 text("A quick tour of Iced (done with Iced)")
-                    .size(22)
+                    .size(self.sz(22))
                     .color(SUBTITLE_COLOR),
-                space().height(50),
+                space().height(self.sp(50.0)),
                 row![
-                    icon_keyboard().size(16).color(SUBTITLE_COLOR),
+                    icon_keyboard().size(self.sz(16)).color(SUBTITLE_COLOR),
                     text("Use arrow keys to navigate")
-                        .size(16)
+                        .size(self.sz(16))
                         .color(SUBTITLE_COLOR),
                 ]
-                .spacing(8)
+                .spacing(self.sp(8.0))
                 .align_y(iced::Alignment::Center),
             ]
             .width(iced::Fill)

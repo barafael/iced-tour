@@ -54,6 +54,7 @@ pub struct App {
     pub quiz_http_answer: Option<u8>,
     pub quiz_button_answer: Option<u8>,
     pub quiz_validation_answer: Option<u8>,
+    pub term: iced_term::Terminal,
 
     // Cached markdown content for each screen
     pub md_intro: Vec<markdown::Item>,
@@ -101,6 +102,7 @@ impl Default for App {
             quiz_http_answer: None,
             quiz_button_answer: None,
             quiz_validation_answer: None,
+            term: shell_backend(),
             md_intro: markdown::parse(intro::MD_INTRO).collect(),
             md_model: markdown::parse(model::MD_MODEL).collect(),
             md_view: markdown::parse(view::MD_VIEW).collect(),
@@ -118,6 +120,26 @@ impl Default for App {
             md_widget_messages: markdown::parse(constructors::MD_WIDGET_MESSAGES).collect(),
         }
     }
+}
+
+fn shell_backend() -> iced_term::Terminal {
+    #[cfg(not(windows))]
+    let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".into());
+    #[cfg(windows)]
+    let shell = "cmd.exe".to_string();
+    let settings = iced_term::settings::Settings {
+        font: iced_term::settings::FontSettings {
+            size: 14.0,
+            font_type: FIRA_MONO,
+            ..Default::default()
+        },
+        backend: iced_term::settings::BackendSettings {
+            program: shell,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    iced_term::Terminal::new(0, settings).expect("failed to create terminal")
 }
 
 #[derive(Debug, Clone)]
@@ -160,6 +182,9 @@ pub enum Message {
     QuizHttpAnswer(u8),
     QuizButtonAnswer(u8),
     QuizValidationAnswer(u8),
+
+    // Terminal
+    TermEvent(iced_term::Event),
 }
 
 fn main() -> iced::Result {
@@ -218,18 +243,20 @@ impl App {
         let needs_tick = self.screen == Screen::Subscriptions
             || self.slide_offset.value() != &sliding::SlideOffset::settled();
 
+        let term_sub = self.term.subscription().map(Message::TermEvent);
+
         if self.screen == Screen::Subscriptions {
             let tick =
                 iced::time::every(std::time::Duration::from_millis(16)).map(|_| Message::Tick);
             let spawn_timer =
                 iced::time::every(std::time::Duration::from_secs(3)).map(|_| Message::SpawnChaos);
-            Subscription::batch([events, tick, spawn_timer])
+            Subscription::batch([events, tick, spawn_timer, term_sub])
         } else if needs_tick {
             let tick =
                 iced::time::every(std::time::Duration::from_millis(16)).map(|_| Message::Tick);
-            Subscription::batch([events, tick])
+            Subscription::batch([events, tick, term_sub])
         } else {
-            events
+            Subscription::batch([events, term_sub])
         }
     }
 
@@ -349,12 +376,16 @@ impl App {
                 self.quiz_validation_answer = Some(answer);
                 Task::none()
             }
+            Message::TermEvent(iced_term::Event::BackendCall(_, cmd)) => {
+                self.term.handle(iced_term::Command::ProxyToBackend(cmd));
+                Task::none()
+            }
         }
     }
 
     fn view(&self) -> Element<'_, Message> {
         let title = text(self.screen.to_string())
-            .size(28)
+            .size(self.sz(28))
             .font(FIRA_MONO)
             .color(ORANGE);
 
@@ -375,6 +406,7 @@ impl App {
             Screen::Tasks => self.view_tasks_screen(),
             Screen::Subscriptions => self.view_subscriptions_screen(),
             Screen::Interactive => self.view_interactive_screen(),
+            Screen::CommunityWidgets => self.view_community_widgets_screen(),
             Screen::Quiz => self.view_quiz_screen(),
             Screen::QuizHttp => self.view_quiz_http_screen(),
             Screen::QuizButton => self.view_quiz_button_screen(),
@@ -398,8 +430,8 @@ impl App {
         let offset = self.slide_offset.value();
         let main_content = container(
             column![title, content]
-                .spacing(20)
-                .padding(30)
+                .spacing(self.sp(20.0))
+                .padding(self.sp(30.0))
                 .width(iced::Fill),
         )
         .padding(Padding {
@@ -462,7 +494,7 @@ impl App {
         let current = self.screen as usize;
         let total = Screen::COUNT;
         let slide_indicator = text(format!("{} / {}", current + 1, total))
-            .size(14)
+            .size(self.sz(14))
             .color(SUBTITLE_COLOR);
 
         let mut nav_row = row![prev_btn, slide_indicator, next_btn]
@@ -481,15 +513,32 @@ impl App {
         nav_row.into()
     }
 
+    /// Scale factor based on window size relative to 800×600 base.
+    pub fn scale(&self) -> f32 {
+        let (w, h) = self.canvas_size;
+        (w / 800.0).min(h / 600.0).max(0.5)
+    }
+
+    /// Scale a pixel size (for text sizes, icon sizes, etc).
+    pub fn sz(&self, base: u32) -> u32 {
+        ((base as f32) * self.scale()) as u32
+    }
+
+    /// Scale a float value (for spacing, padding, heights).
+    pub fn sp(&self, base: f32) -> f32 {
+        base * self.scale()
+    }
+
     pub fn md_settings(&self) -> markdown::Settings {
-        let mut settings = markdown::Settings::with_text_size(TEXT_SIZE, self.theme.clone());
-        settings.code_size = CODE_SIZE.into();
+        let mut settings =
+            markdown::Settings::with_text_size(self.sz(TEXT_SIZE), self.theme.clone());
+        settings.code_size = self.sz(CODE_SIZE).into();
         settings
     }
 
     pub fn md_container<'a>(&self, md: &'a [markdown::Item]) -> Element<'a, Message> {
-        let md_view: Element<'a, Message, AppTheme, _> = markdown::view(md, self.md_settings())
-            .map(|_| Message::Noop);
+        let md_view: Element<'a, Message, AppTheme, _> =
+            markdown::view(md, self.md_settings()).map(|_| Message::Noop);
         themer(Some(AppTheme(self.theme.clone())), md_view).into()
     }
 }

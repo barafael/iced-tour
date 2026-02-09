@@ -86,6 +86,7 @@ const LETTERS: [&str; 4] = ["A:", "B:", "C:", "D:"];
 
 impl App {
     fn view_quiz<'a>(
+        &self,
         question: &'a str,
         options: &'a [(&'a str, Message)],
         answer: Option<u8>,
@@ -110,10 +111,10 @@ impl App {
                 let answered = answer.is_some();
 
                 let content = row![
-                    text(LETTERS[i]).size(18).font(FIRA_MONO).color(ORANGE),
-                    text(*label).size(18).color(Color::WHITE),
+                    text(LETTERS[i]).size(self.sz(18)).font(FIRA_MONO).color(ORANGE),
+                    text(*label).size(self.sz(18)).color(Color::WHITE),
                 ]
-                .spacing(10)
+                .spacing(self.sp(10.0))
                 .align_y(iced::Alignment::Center);
 
                 button(content)
@@ -133,31 +134,31 @@ impl App {
         let d = buttons.next().unwrap();
 
         let grid = column![
-            row![a, b].spacing(16),
-            row![c, d].spacing(16),
+            row![a, b].spacing(self.sp(16.0)),
+            row![c, d].spacing(self.sp(16.0)),
         ]
-        .spacing(16);
+        .spacing(self.sp(16.0));
 
         // Feedback text below
         let feedback: Element<'_, Message> = match answer {
             None => text("Select an answer")
-                .size(16)
+                .size(self.sz(16))
                 .color(SUBTITLE_COLOR)
                 .into(),
             Some(idx) => {
                 if let Some((_, fb, is_correct)) = feedbacks.iter().find(|(i, _, _)| *i == idx) {
                     let icon: Element<'_, Message> = if *is_correct {
-                        icon_circle_check().size(18).color(CORRECT_COLOR).into()
+                        icon_circle_check().size(self.sz(18)).color(CORRECT_COLOR).into()
                     } else {
-                        icon_circle_x().size(18).color(INCORRECT_COLOR).into()
+                        icon_circle_x().size(self.sz(18)).color(INCORRECT_COLOR).into()
                     };
                     let color = if *is_correct {
                         CORRECT_COLOR
                     } else {
                         INCORRECT_COLOR
                     };
-                    row![icon, text(*fb).size(16).color(color)]
-                        .spacing(8)
+                    row![icon, text(*fb).size(self.sz(16)).color(color)]
+                        .spacing(self.sp(8.0))
                         .align_y(iced::Alignment::Center)
                         .into()
                 } else {
@@ -168,14 +169,14 @@ impl App {
 
         container(
             column![
-                text(question).size(28).color(ORANGE),
-                space().height(30),
+                text(question).size(self.sz(28)).color(ORANGE),
+                space().height(self.sp(30.0)),
                 grid,
-                space().height(20),
+                space().height(self.sp(20.0)),
                 feedback,
             ]
-            .spacing(10)
-            .padding(20),
+            .spacing(self.sp(10.0))
+            .padding(self.sp(20.0)),
         )
         .width(iced::Fill)
         .height(iced::Fill)
@@ -185,7 +186,7 @@ impl App {
     }
 
     pub fn view_quiz_screen(&self) -> Element<'_, Message> {
-        Self::view_quiz(
+        self.view_quiz(
             "Where should validation of a text input happen?",
             &[
                 ("In the View", Message::QuizAnswer(0)),
@@ -204,7 +205,7 @@ impl App {
     }
 
     pub fn view_quiz_http_screen(&self) -> Element<'_, Message> {
-        Self::view_quiz(
+        self.view_quiz(
             "Where should you make an HTTP request?",
             &[
                 ("In the View", Message::QuizHttpAnswer(0)),
@@ -223,7 +224,7 @@ impl App {
     }
 
     pub fn view_quiz_button_screen(&self) -> Element<'_, Message> {
-        Self::view_quiz(
+        self.view_quiz(
             "How do you disable a button when a field is empty?",
             &[
                 ("Conditional on_press in View", Message::QuizButtonAnswer(0)),
@@ -242,7 +243,7 @@ impl App {
     }
 
     pub fn view_quiz_validation_screen(&self) -> Element<'_, Message> {
-        Self::view_quiz(
+        self.view_quiz(
             "How does input validation with error display work?",
             &[
                 ("Update → Model → View", Message::QuizValidationAnswer(0)),

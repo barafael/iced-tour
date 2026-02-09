@@ -39,12 +39,12 @@ impl App {
     pub fn view_layout_row_col_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The building blocks of layout.").size(TEXT_SIZE),
-                space().height(12),
+                text("The building blocks of layout.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 self.md_container(&self.md_row_col),
-                space().height(20),
-                text("Live example:").size(TEXT_SIZE).color(SUBTITLE_COLOR),
-                space().height(10),
+                space().height(self.sp(20.0)),
+                text("Live example:").size(self.sz(TEXT_SIZE)).color(SUBTITLE_COLOR),
+                space().height(self.sp(10.0)),
                 container(
                     column![
                         row![
@@ -52,21 +52,21 @@ impl App {
                             text_input("Type here...", &self.demo_input)
                                 .on_input(Message::DemoInputChanged)
                         ]
-                        .spacing(10)
+                        .spacing(self.sp(10.0))
                         .align_y(iced::Alignment::Center),
                         row![
                             button("Cancel").on_press(Message::Noop),
                             button("Submit").on_press(Message::Noop),
                         ]
-                        .spacing(10),
+                        .spacing(self.sp(10.0)),
                     ]
-                    .spacing(10)
+                    .spacing(self.sp(10.0))
                 )
-                .padding(15)
+                .padding(self.sp(15.0))
                 .style(container::rounded_box),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }
@@ -74,22 +74,22 @@ impl App {
     pub fn view_layout_container_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Container wraps content for positioning and styling.").size(TEXT_SIZE),
-                space().height(12),
+                text("Container wraps content for positioning and styling.").size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 self.md_container(&self.md_container),
-                space().height(20),
-                text("Live example:").size(TEXT_SIZE).color(SUBTITLE_COLOR),
-                space().height(10),
+                space().height(self.sp(20.0)),
+                text("Live example:").size(self.sz(TEXT_SIZE)).color(SUBTITLE_COLOR),
+                space().height(self.sp(10.0)),
                 container(
                     container(text("Centered and styled"))
-                        .padding(20)
+                        .padding(self.sp(20.0))
                         .style(container::rounded_box),
                 )
                 .width(iced::Fill)
                 .center_x(iced::Fill),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }
@@ -116,39 +116,39 @@ impl App {
 
         let spacing_slider = row![
             text(format!(".spacing({:.0})", sp))
-                .size(16)
+                .size(self.sz(16))
                 .font(FIRA_MONO),
-            slider(0.0..=40.0, sp, Message::DemoSpacingChanged).width(200),
+            slider(0.0..=40.0, sp, Message::DemoSpacingChanged).width(self.sp(200.0)),
         ]
-        .spacing(12)
+        .spacing(self.sp(12.0))
         .align_y(iced::Alignment::Center);
 
         let padding_slider = row![
             text(format!(".padding({:.0})", pd))
-                .size(16)
+                .size(self.sz(16))
                 .font(FIRA_MONO),
-            slider(0.0..=40.0, pd, Message::DemoPaddingChanged).width(200),
+            slider(0.0..=40.0, pd, Message::DemoPaddingChanged).width(self.sp(200.0)),
         ]
-        .spacing(12)
+        .spacing(self.sp(12.0))
         .align_y(iced::Alignment::Center);
 
         scrollable(
             column![
                 text("Control gaps and alignment with spacing, padding, and align.")
-                    .size(TEXT_SIZE),
-                space().height(12),
+                    .size(self.sz(TEXT_SIZE)),
+                space().height(self.sp(12.0)),
                 self.md_container(&self.md_spacing),
-                space().height(20),
-                row![spacing_slider, padding_slider].spacing(20),
-                space().height(12),
+                space().height(self.sp(20.0)),
+                row![spacing_slider, padding_slider].spacing(self.sp(20.0)),
+                space().height(self.sp(12.0)),
                 preview,
-                space().height(8),
+                space().height(self.sp(8.0)),
                 text("hint: press shift")
-                    .size(TEXT_SIZE - 4)
+                    .size(self.sz(TEXT_SIZE - 4))
                     .color(SUBTITLE_COLOR),
             ]
-            .spacing(8)
-            .padding(30),
+            .spacing(self.sp(8.0))
+            .padding(self.sp(30.0)),
         )
         .into()
     }
