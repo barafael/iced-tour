@@ -1,8 +1,7 @@
 use iced::{
-    Border, Color, Shadow, Theme,
-    widget::{column, container, row, space, text},
+    Border, Color, Element, Shadow, Theme,
     widget::button as iced_button,
-    Element,
+    widget::{column, container, row, space, text},
 };
 use iced_anim::widget::button;
 use lucide_icons::iced::{icon_circle_check, icon_circle_x};
@@ -46,7 +45,10 @@ fn wwm_style(
             iced_button::Style {
                 background: Some(CORRECT_COLOR.into()),
                 text_color: Color::WHITE,
-                border: Border { color: CORRECT_COLOR, ..border },
+                border: Border {
+                    color: CORRECT_COLOR,
+                    ..border
+                },
                 shadow: Shadow::default(),
                 snap: false,
             }
@@ -55,21 +57,15 @@ fn wwm_style(
             iced_button::Style {
                 background: Some(INCORRECT_COLOR.into()),
                 text_color: Color::WHITE,
-                border: Border { color: INCORRECT_COLOR, ..border },
-                shadow: Shadow::default(),
-                snap: false,
-            }
-        } else if !is_selected && is_correct {
-            // Not picked, but this is the correct answer → reveal green
-            iced_button::Style {
-                background: Some(Color::from_rgba(0.18, 0.65, 0.35, 0.7).into()),
-                text_color: Color::WHITE,
-                border: Border { color: CORRECT_COLOR, ..border },
+                border: Border {
+                    color: INCORRECT_COLOR,
+                    ..border
+                },
                 shadow: Shadow::default(),
                 snap: false,
             }
         } else {
-            // Not picked, not correct → dim
+            // Not picked — dim (don't reveal correct answer)
             iced_button::Style {
                 background: Some(WWM_BG_DIMMED.into()),
                 text_color: Color::from_rgba(1.0, 1.0, 1.0, 0.4),
@@ -97,10 +93,7 @@ impl App {
         assert_eq!(options.len(), 4, "WWM quiz requires exactly 4 options");
 
         // Find which index is correct
-        let correct_idx = feedbacks
-            .iter()
-            .find(|(_, _, c)| *c)
-            .map(|(i, _, _)| *i);
+        let correct_idx = feedbacks.iter().find(|(_, _, c)| *c).map(|(i, _, _)| *i);
 
         // Build 4 styled buttons
         let buttons: Vec<Element<'a, Message>> = options
@@ -113,8 +106,11 @@ impl App {
                 let answered = answer.is_some();
 
                 let content = row![
-                    text(LETTERS[i]).size(self.sz(18)).font(FIRA_MONO).color(ORANGE),
-                    text(*label).size(self.sz(18)).color(Color::WHITE),
+                    text(LETTERS[i])
+                        .size(self.sz(24))
+                        .font(FIRA_MONO)
+                        .color(ORANGE),
+                    text(*label).size(self.sz(24)).color(Color::WHITE),
                 ]
                 .spacing(self.sp(10.0))
                 .align_y(iced::Alignment::Center);
@@ -144,22 +140,28 @@ impl App {
         // Feedback text below
         let feedback: Element<'_, Message> = match answer {
             None => text("Select an answer")
-                .size(self.sz(16))
+                .size(self.sz(22))
                 .color(SUBTITLE_COLOR)
                 .into(),
             Some(idx) => {
                 if let Some((_, fb, is_correct)) = feedbacks.iter().find(|(i, _, _)| *i == idx) {
                     let icon: Element<'_, Message> = if *is_correct {
-                        icon_circle_check().size(self.sz(18)).color(CORRECT_COLOR).into()
+                        icon_circle_check()
+                            .size(self.sz(24))
+                            .color(CORRECT_COLOR)
+                            .into()
                     } else {
-                        icon_circle_x().size(self.sz(18)).color(INCORRECT_COLOR).into()
+                        icon_circle_x()
+                            .size(self.sz(24))
+                            .color(INCORRECT_COLOR)
+                            .into()
                     };
                     let color = if *is_correct {
                         CORRECT_COLOR
                     } else {
                         INCORRECT_COLOR
                     };
-                    row![icon, text(*fb).size(self.sz(16)).color(color)]
+                    row![icon, text(*fb).size(self.sz(22)).color(color)]
                         .spacing(self.sp(8.0))
                         .align_y(iced::Alignment::Center)
                         .into()
@@ -171,7 +173,7 @@ impl App {
 
         container(
             column![
-                text(question).size(self.sz(28)).color(ORANGE),
+                text(question).size(self.sz(38)).color(ORANGE),
                 space().height(self.sp(30.0)),
                 grid,
                 space().height(self.sp(20.0)),

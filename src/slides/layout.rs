@@ -1,8 +1,7 @@
 use iced::{
     Color, Element,
-    widget::{column, container, row, scrollable, slider, space, text, text_input},
+    widget::{column, container, row, scrollable, slider, space, text},
 };
-use iced_anim::widget::button;
 
 use crate::{App, FIRA_MONO, Message, SUBTITLE_COLOR, TEXT_SIZE};
 
@@ -10,11 +9,15 @@ pub const MD_ROW_COL: &str = r#"
 ```rust
 // Nested layouts
 column![
-    row![text("Name"), text_input("Type here...", &self.input)],
-    row![button("Cancel"), button("Submit")],
+    row![o(), b(), o(), b(), o()],
+    row![b(), o(), b(), o(), b()],
+    row![o(), b(), o(), b(), o()],
 ]
 ```
 "#;
+
+const PASTEL_ORANGE: Color = Color::from_rgb(1.0, 0.75, 0.5);
+const PASTEL_BLUE: Color = Color::from_rgb(0.55, 0.75, 1.0);
 
 pub const MD_CONTAINER: &str = r#"
 ```rust
@@ -44,27 +47,28 @@ impl App {
                 space().height(self.sp(12.0)),
                 self.md_container(&self.md_row_col),
                 space().height(self.sp(20.0)),
-                text("Live example:").size(self.sz(TEXT_SIZE)).color(SUBTITLE_COLOR),
                 space().height(self.sp(10.0)),
-                container(
-                    column![
-                        row![
-                            text("Name"),
-                            text_input("Type here...", &self.demo_input)
-                                .on_input(Message::DemoInputChanged)
-                        ]
-                        .spacing(self.sp(10.0))
-                        .align_y(iced::Alignment::Center),
-                        row![
-                            button("Cancel").on_press(Message::Noop),
-                            button("Submit").on_press(Message::Noop),
-                        ]
-                        .spacing(self.sp(10.0)),
-                    ]
-                    .spacing(self.sp(10.0))
-                )
-                .padding(self.sp(15.0))
-                .style(container::rounded_box),
+                {
+                    let cell = |color: Color| {
+                        let s = self.sp(50.0);
+                        container(space())
+                            .width(s)
+                            .height(s)
+                            .style(move |_: &_| container::Style {
+                                background: Some(color.into()),
+                                ..Default::default()
+                            })
+                    };
+                    let o = || cell(PASTEL_ORANGE);
+                    let b = || cell(PASTEL_BLUE);
+                    container(column![
+                        row![o(), b(), o(), b(), o()],
+                        row![b(), o(), b(), o(), b()],
+                        row![o(), b(), o(), b(), o()],
+                    ])
+                    .style(container::rounded_box)
+                    .clip(true)
+                },
             ]
             .spacing(self.sp(8.0)),
         )
@@ -74,11 +78,14 @@ impl App {
     pub fn view_layout_container_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Container wraps content for positioning and styling.").size(self.sz(TEXT_SIZE)),
+                text("Container wraps content for positioning and styling.")
+                    .size(self.sz(TEXT_SIZE)),
                 space().height(self.sp(12.0)),
                 self.md_container(&self.md_container),
                 space().height(self.sp(20.0)),
-                text("Live example:").size(self.sz(TEXT_SIZE)).color(SUBTITLE_COLOR),
+                text("Live example:")
+                    .size(self.sz(TEXT_SIZE))
+                    .color(SUBTITLE_COLOR),
                 space().height(self.sp(10.0)),
                 container(
                     container(text("Centered and styled"))
@@ -115,7 +122,7 @@ impl App {
 
         let spacing_slider = row![
             text(format!(".spacing({:.0})", sp))
-                .size(self.sz(16))
+                .size(self.sz(22))
                 .font(FIRA_MONO),
             slider(0.0..=40.0, sp, Message::DemoSpacingChanged).width(self.sp(200.0)),
         ]
@@ -124,7 +131,7 @@ impl App {
 
         let padding_slider = row![
             text(format!(".padding({:.0})", pd))
-                .size(self.sz(16))
+                .size(self.sz(22))
                 .font(FIRA_MONO),
             slider(0.0..=40.0, pd, Message::DemoPaddingChanged).width(self.sp(200.0)),
         ]

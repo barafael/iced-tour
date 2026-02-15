@@ -43,7 +43,7 @@ impl App {
     pub fn view_recap_screen(&self) -> Element<'_, Message> {
         container(
             column![
-                text("The Elm Architecture").size(self.sz(40)).color(ORANGE),
+                text("The Elm Architecture").size(self.sz(54)).color(ORANGE),
                 space().height(self.sp(30.0)),
                 svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(self.sp(280.0)),
             ]

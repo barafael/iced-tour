@@ -1,8 +1,8 @@
 use iced::{
+    Color, Element, Font, Length, Task,
     widget::{
         button, checkbox, column, container, pick_list, row, scrollable, space, text, text_input,
     },
-    Color, Element, Font, Length, Task,
 };
 use serde::Serialize;
 use strum::{Display, EnumIter, IntoEnumIterator};
@@ -24,7 +24,7 @@ impl Default for StyleConfig {
         Self {
             mono_font: FIRA_MONO,
             subtitle_color: Color::from_rgb(0.45, 0.45, 0.45),
-            text_size: 22,
+            text_size: 24,
         }
     }
 }
@@ -155,7 +155,7 @@ impl PagePoker {
         // Message log
         let message_log_content: Element<'_, Message> = if self.message_log.is_empty() {
             text("Messages will appear here...")
-                .size(14)
+                .size(20)
                 .color(subtitle)
                 .into()
         } else {
@@ -163,11 +163,7 @@ impl PagePoker {
                 self.message_log
                     .iter()
                     .map(|msg| {
-                        row![
-                            text(msg).size(14).font(mono),
-                            space().width(Length::Fill)
-                        ]
-                        .into()
+                        row![text(msg).size(20).font(mono), space().width(Length::Fill)].into()
                     })
                     .collect::<Vec<_>>(),
             )
@@ -196,12 +192,9 @@ impl PagePoker {
             // State and messages side by side
             row![
                 column![
-                    text("Current State")
-                        .size(16)
-                        .font(mono)
-                        .color(subtitle),
+                    text("Current State").size(22).font(mono).color(subtitle),
                     space().height(8),
-                    container(text(state_ron).size(14).font(mono))
+                    container(text(state_ron).size(20).font(mono))
                         .width(iced::Fill)
                         .padding(12)
                         .style(container::rounded_box),
@@ -209,10 +202,7 @@ impl PagePoker {
                 .height(iced::Fill)
                 .width(Length::FillPortion(1)),
                 column![
-                    text("Recent Messages")
-                        .size(16)
-                        .font(mono)
-                        .color(subtitle),
+                    text("Recent Messages").size(22).font(mono).color(subtitle),
                     space().height(8),
                     container(scrollable(message_log_content).height(150))
                         .width(iced::Fill)

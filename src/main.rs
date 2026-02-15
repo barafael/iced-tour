@@ -1,8 +1,6 @@
 use iced::{
     Color, Element, Event, Font, Padding, Subscription, Task, Theme, event, keyboard,
-    widget::{
-        canvas, column, container, markdown, pick_list, row, space, stack, text, themer,
-    },
+    widget::{canvas, column, container, markdown, pick_list, row, space, stack, text, themer},
 };
 use iced_anim::{Animated, Animation, Motion, widget::button};
 use lucide_icons::{
@@ -25,8 +23,9 @@ pub const FIRA_MONO: Font = Font::with_name("Fira Mono");
 
 pub const ICED_LOGO: &[u8] = include_bytes!("../assets/iced-logo.svg");
 
-pub const TEXT_SIZE: u32 = 22;
-const CODE_SIZE: u32 = 20;
+pub const TEXT_SIZE: u32 = 24;
+const CODE_SIZE: u32 = 22;
+
 pub const ORANGE: Color = Color::from_rgb(1.0, 0.4, 0.0);
 pub const SUBTITLE_COLOR: Color = Color::from_rgb(0.45, 0.45, 0.45);
 pub const CORRECT_COLOR: Color = Color::from_rgb(0.18, 0.65, 0.35);
@@ -404,7 +403,7 @@ impl App {
 
     fn view(&self) -> Element<'_, Message> {
         let title = text(self.screen.to_string())
-            .size(self.sz(28))
+            .size(self.sz(38))
             .font(FIRA_MONO)
             .color(ORANGE);
 
@@ -514,7 +513,7 @@ impl App {
         let current = self.screen as usize;
         let total = Screen::COUNT;
         let slide_indicator = text(format!("{} / {}", current + 1, total))
-            .size(self.sz(14))
+            .size(self.sz(20))
             .color(SUBTITLE_COLOR);
 
         let mut nav_row = row![prev_btn, slide_indicator, next_btn]

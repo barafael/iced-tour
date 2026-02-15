@@ -1,6 +1,6 @@
 use iced::{
-    widget::{column, scrollable, space, text},
     Element,
+    widget::{column, scrollable, space, text},
 };
 use iced_anim::widget::button;
 
@@ -23,18 +23,13 @@ impl App {
     pub fn view_subscriptions_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Subscriptions let your app react to external events.").size(self.sz(TEXT_SIZE)),
+                text("Subscriptions feed external (asynchronous) events into your app.")
+                    .size(self.sz(TEXT_SIZE)),
                 space().height(self.sp(12.0)),
                 self.md_container(&self.md_subscriptions),
                 space().height(self.sp(16.0)),
                 space().height(self.sp(8.0)),
-                text("  • Arrow Right → next slide")
-                    .size(self.sz(TEXT_SIZE - 4))
-                    .color(SUBTITLE_COLOR),
-                text("  • Arrow Left → previous slide")
-                    .size(self.sz(TEXT_SIZE - 4))
-                    .color(SUBTITLE_COLOR),
-                text("  • Ctrl → show theme picker")
+                text("This slideshow listens to keyboard events.")
                     .size(self.sz(TEXT_SIZE - 4))
                     .color(SUBTITLE_COLOR),
                 space().height(self.sp(16.0)),

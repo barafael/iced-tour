@@ -18,7 +18,7 @@ pub const MD_WIDGET_MESSAGES: &str = r#"
 // Each widget sends its state into your Message:
 text_input(..).on_input(f)    // f: impl Fn(String) -> Message
 toggler(..).on_toggle(f)      // f: impl Fn(bool) -> Message
-button(..).on_press(message)  // message: Message (no fn, just a value)
+button(..).on_press(message)  // f: impl Fn(()) -> Message
 ```
 "#;
 
