@@ -16,7 +16,7 @@ impl App {
                 space().height(self.sp(30.0)),
                 text("Discover Iced").size(self.sz(76)).color(ORANGE),
                 space().height(self.sp(16.0)),
-                text("A quick tour of Iced (done with Iced)")
+                text("A quick tour of Iced (made with Iced)")
                     .size(self.sz(30))
                     .color(SUBTITLE_COLOR),
                 space().height(self.sp(50.0)),

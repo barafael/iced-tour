@@ -1,20 +1,20 @@
 use iced::{Element, Font, Task};
-use page_poker::{FIRA_MONO_BYTES, PagePoker};
+use page_boop::{FIRA_MONO_BYTES, PageBoop};
 
 const FIRA_MONO: Font = Font::with_name("Fira Mono");
 
 struct App {
-    poker: PagePoker,
+    poker: PageBoop,
 }
 
 #[derive(Debug, Clone)]
 enum Message {
-    Poker(page_poker::Message),
+    Poker(page_boop::Message),
 }
 
 fn main() -> iced::Result {
     iced::application(App::default, App::update, App::view)
-        .title("Page Poker")
+        .title("Page Boop")
         .font(FIRA_MONO_BYTES)
         .default_font(FIRA_MONO)
         .run()
@@ -23,7 +23,7 @@ fn main() -> iced::Result {
 impl Default for App {
     fn default() -> Self {
         Self {
-            poker: PagePoker::new(),
+            poker: PageBoop::new(),
         }
     }
 }

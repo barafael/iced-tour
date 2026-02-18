@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "page-poker"]
+members = [".", "page-boop"]
 
 [package]
 name = "iced-tour"
@@ -7,7 +7,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-page-poker = { path = "page-poker" }
+page-boop = { path = "page-boop" }
 iced = { version = "0.14", features = [
   "canvas",
   "highlighter",
@@ -16,6 +16,8 @@ iced = { version = "0.14", features = [
   "tokio",
   "wayland",
   "x11",
+  # "debug"
+  # ,"time-travel"
 ] }
 iced_anim = { version = "0.3", features = ["derive", "widgets"] }
 rand = "0.9"

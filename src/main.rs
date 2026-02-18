@@ -36,7 +36,7 @@ pub const ELM_CIRCLE_OF_LIFE: &[u8] = include_bytes!("../assets/elm.svg");
 pub struct App {
     pub screen: Screen,
     slide_offset: Animated<sliding::SlideOffset>,
-    pub page_poker: page_poker::PagePoker,
+    pub page_boop: page_boop::PageBoop,
     pub theme: Theme,
     pub ctrl_held: bool,
     pub shift_held: bool,
@@ -81,7 +81,7 @@ impl Default for App {
         Self {
             screen: Screen::default(),
             slide_offset: Animated::new(sliding::SlideOffset::settled(), Motion::SNAPPY),
-            page_poker: page_poker::PagePoker::with_style(page_poker::StyleConfig {
+            page_boop: page_boop::PageBoop::with_style(page_boop::StyleConfig {
                 mono_font: FIRA_MONO,
                 subtitle_color: SUBTITLE_COLOR,
                 text_size: TEXT_SIZE,
@@ -149,8 +149,8 @@ pub enum Message {
     NextScreen,
     PrevScreen,
 
-    // Page Poker (interactive screen)
-    PagePoker(page_poker::Message),
+    // Page Boop (interactive screen)
+    PageBoop(page_boop::Message),
 
     // No-op (used for markdown link clicks)
     Noop,
@@ -299,8 +299,8 @@ impl App {
                 Task::none()
             }
 
-            // Page Poker
-            Message::PagePoker(msg) => self.page_poker.update(msg).map(Message::PagePoker),
+            // Page Boop
+            Message::PageBoop(msg) => self.page_boop.update(msg).map(Message::PageBoop),
             Message::ButtonClicked => {
                 self.button_clicks += 1;
                 Task::none()

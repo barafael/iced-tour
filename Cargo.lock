@@ -1563,7 +1563,7 @@ dependencies = [
  "iced_aw",
  "iced_term",
  "lucide-icons",
- "page-poker",
+ "page-boop",
  "rand",
  "rotalubat",
  "strum",
@@ -2900,7 +2900,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "page-poker"
+name = "page-boop"
 version = "0.1.0"
 dependencies = [
  "humansize",

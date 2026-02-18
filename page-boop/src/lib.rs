@@ -54,15 +54,15 @@ pub struct UrlAnalyzer {
     loading: bool,
 }
 
-/// Self-contained "Page Poker" component state.
-pub struct PagePoker {
+/// Self-contained "Page Boop" component state.
+pub struct PageBoop {
     model: UrlAnalyzer,
     message_log: Vec<String>,
     style: StyleConfig,
 }
 
-impl PagePoker {
-    /// Create a new PagePoker with default styling.
+impl PageBoop {
+    /// Create a new PageBoop with default styling.
     pub fn new() -> Self {
         Self {
             model: UrlAnalyzer::default(),
@@ -71,7 +71,7 @@ impl PagePoker {
         }
     }
 
-    /// Create a new PagePoker with custom styling.
+    /// Create a new PageBoop with custom styling.
     pub fn with_style(style: StyleConfig) -> Self {
         Self {
             model: UrlAnalyzer::default(),
@@ -125,7 +125,7 @@ impl PagePoker {
         }
     }
 
-    /// Render the Page Poker UI.
+    /// Render the Page Boop UI.
     pub fn view(&self) -> Element<'_, Message> {
         let mono = self.style.mono_font;
         let subtitle = self.style.subtitle_color;
@@ -219,7 +219,7 @@ impl PagePoker {
     }
 }
 
-impl Default for PagePoker {
+impl Default for PageBoop {
     fn default() -> Self {
         Self::new()
     }
