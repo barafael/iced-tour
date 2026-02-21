@@ -3,7 +3,7 @@ use iced::{
     widget::{column, markdown, scrollable, space, text},
 };
 
-use crate::{Message, ScaleCtx, TEXT_SIZE, render_markdown};
+use crate::{Message, TEXT_SIZE, render_markdown};
 
 const MD_MESSAGE: &str = r#"
 ```rust
@@ -30,16 +30,16 @@ impl Default for MessageSlide {
 }
 
 impl MessageSlide {
-    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Messages describe user actions or system events.").size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(8.0)),
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(12.0)),
-                text("Messages are produced by the view.").size(ctx.sz(TEXT_SIZE))
+                text("Messages describe user actions or system events.").size(TEXT_SIZE),
+                space().height(8.0),
+                render_markdown(&self.md, theme),
+                space().height(12.0),
+                text("Messages are produced by the view.").size(TEXT_SIZE)
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

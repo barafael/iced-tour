@@ -43,40 +43,13 @@ pub const ELM_CIRCLE_OF_LIFE: &[u8] = include_bytes!("../assets/elm.svg");
 const TICK_INTERVAL: Duration = Duration::from_millis(16);
 const CHAOS_SPAWN_INTERVAL: Duration = Duration::from_secs(3);
 
-// --- Scaling context ---
-
-#[derive(Clone, Copy)]
-pub struct ScaleCtx {
-    scale: f32,
-}
-
-impl ScaleCtx {
-    pub fn new(scale: f32) -> Self {
-        Self { scale }
-    }
-
-    pub fn sz(&self, base: u32) -> u32 {
-        ((base as f32) * self.scale) as u32
-    }
-
-    pub fn sp(&self, base: f32) -> f32 {
-        base * self.scale
-    }
-}
-
-pub fn render_markdown<'a>(
-    md: &'a [markdown::Item],
-    ctx: ScaleCtx,
-    theme: &Theme,
-) -> Element<'a, Message> {
-    let mut settings = markdown::Settings::with_text_size(ctx.sz(TEXT_SIZE), theme.clone());
-    settings.code_size = ctx.sz(CODE_SIZE).into();
+pub fn render_markdown<'a>(md: &'a [markdown::Item], theme: &Theme) -> Element<'a, Message> {
+    let mut settings = markdown::Settings::with_text_size(TEXT_SIZE, theme.clone());
+    settings.code_size = CODE_SIZE.into();
     let md_view: Element<'a, Message, AppTheme, _> =
         markdown::view(md, settings).map(|_| Message::Noop);
     themer(Some(AppTheme(theme.clone())), md_view).into()
 }
-
-// --- App ---
 
 pub struct App {
     // Components
@@ -181,10 +154,6 @@ fn main() -> iced::Result {
 impl App {
     fn theme(&self) -> Theme {
         self.theming.theme().clone()
-    }
-
-    fn scale_ctx(&self) -> ScaleCtx {
-        ScaleCtx::new(self.chaos.scale())
     }
 
     fn subscription(&self) -> Subscription<Message> {
@@ -319,47 +288,44 @@ impl App {
 
     fn view(&self) -> Element<'_, Message> {
         let screen = self.navigation.screen();
-        let ctx = self.scale_ctx();
         let theme = self.theming.theme();
 
         let title = text(screen.to_string())
-            .size(ctx.sz(38))
+            .size(38)
             .font(FIRA_MONO)
             .color(ORANGE);
 
         let content: Element<Message> = match screen {
-            Slide::Title => self.title_slide.view(ctx),
-            Slide::Intro => self.intro_slide.view(ctx, theme),
-            Slide::Model => self.model_slide.view(ctx, theme),
-            Slide::View => self.view_slide.view_view(ctx, theme),
-            Slide::LayoutRowCol => self.layout_slide.view_row_col(ctx, theme),
-            Slide::LayoutContainer => self.layout_slide.view_container(ctx, theme),
+            Slide::Title => self.title_slide.view(),
+            Slide::Intro => self.intro_slide.view(theme),
+            Slide::Model => self.model_slide.view(theme),
+            Slide::View => self.view_slide.view_view(theme),
+            Slide::LayoutRowCol => self.layout_slide.view_row_col(theme),
+            Slide::LayoutContainer => self.layout_slide.view_container(theme),
             Slide::LayoutSpacing => {
                 self.layout_slide
-                    .view_spacing(ctx, theme, &self.demo, self.shift_held)
+                    .view_spacing(theme, &self.demo, self.shift_held)
             }
-            Slide::Button => self.button_slide.view(ctx, theme, &self.demo),
-            Slide::TextInput => self.text_input_slide.view(ctx, theme, &self.demo),
-            Slide::Theming => self.view_slide.view_theming(ctx, &self.theming),
-            Slide::ThemePicker => self.view_slide.view_theme_picker(ctx, &self.theming),
-            Slide::Message => self.message_slide.view(ctx, theme),
-            Slide::Constructors => self.constructors_slide.view(ctx, theme),
-            Slide::Update => self.update_slide.view(ctx, theme),
-            Slide::Tasks => self.tasks_slide.view(ctx, theme),
-            Slide::Subscriptions => self.subscriptions_slide.view(ctx, theme),
+            Slide::Button => self.button_slide.view(theme, &self.demo),
+            Slide::TextInput => self.text_input_slide.view(theme, &self.demo),
+            Slide::Theming => self.view_slide.view_theming(&self.theming),
+            Slide::ThemePicker => self.view_slide.view_theme_picker(&self.theming),
+            Slide::Message => self.message_slide.view(theme),
+            Slide::Constructors => self.constructors_slide.view(theme),
+            Slide::Update => self.update_slide.view(theme),
+            Slide::Tasks => self.tasks_slide.view(theme),
+            Slide::Subscriptions => self.subscriptions_slide.view(theme),
             Slide::Interactive => self.interactive_slide.view(&self.page_boop),
-            Slide::CommunityWidgets => self.community_widgets_slide.view(ctx, &self.terminal),
-            Slide::Quiz => slides::quiz::QuizSlides::view_quiz_screen(ctx, &self.quiz),
-            Slide::QuizHttp => slides::quiz::QuizSlides::view_quiz_http(ctx, &self.quiz),
-            Slide::QuizButton => slides::quiz::QuizSlides::view_quiz_button(ctx, &self.quiz),
-            Slide::QuizValidation => {
-                slides::quiz::QuizSlides::view_quiz_validation(ctx, &self.quiz)
-            }
-            Slide::Takeaways => self.recap_slide.view_takeaways(ctx),
-            Slide::Recap => self.recap_slide.view_recap(ctx),
+            Slide::CommunityWidgets => self.community_widgets_slide.view(&self.terminal),
+            Slide::Quiz => slides::quiz::QuizSlides::view_quiz_screen(&self.quiz),
+            Slide::QuizHttp => slides::quiz::QuizSlides::view_quiz_http(&self.quiz),
+            Slide::QuizButton => slides::quiz::QuizSlides::view_quiz_button(&self.quiz),
+            Slide::QuizValidation => slides::quiz::QuizSlides::view_quiz_validation(&self.quiz),
+            Slide::Takeaways => self.recap_slide.view_takeaways(),
+            Slide::Recap => self.recap_slide.view_recap(),
         };
 
-        let nav = self.view_navigation(ctx);
+        let nav = self.view_navigation();
         let nav_bar = container(nav).center_x(iced::Fill).padding(20);
 
         // Orange stripe at the top
@@ -374,8 +340,8 @@ impl App {
         let offset = self.navigation.slide_offset().value();
         let main_content = container(
             column![title, content]
-                .spacing(ctx.sp(20.0))
-                .padding(ctx.sp(30.0))
+                .spacing(20.0)
+                .padding(30.0)
                 .width(iced::Fill),
         )
         .padding(Padding {
@@ -414,7 +380,7 @@ impl App {
         }
     }
 
-    fn view_navigation(&self, ctx: ScaleCtx) -> Element<'_, Message> {
+    fn view_navigation(&self) -> Element<'_, Message> {
         let screen = self.navigation.screen();
 
         let prev_label = row![icon_chevron_left(), text("Previous")]
@@ -440,7 +406,7 @@ impl App {
         let current = screen as usize;
         let total = Slide::COUNT;
         let slide_indicator = text(format!("{} / {}", current + 1, total))
-            .size(ctx.sz(20))
+            .size(20)
             .color(SUBTITLE_COLOR);
 
         let mut nav_row = row![prev_btn, slide_indicator, next_btn]

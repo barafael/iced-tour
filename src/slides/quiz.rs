@@ -6,9 +6,7 @@ use iced::{
 use iced_anim::widget::button;
 use lucide_icons::iced::{icon_circle_check, icon_circle_x};
 
-use crate::{
-    CORRECT_COLOR, FIRA_MONO, INCORRECT_COLOR, Message, ORANGE, SUBTITLE_COLOR, ScaleCtx, quiz,
-};
+use crate::{CORRECT_COLOR, FIRA_MONO, INCORRECT_COLOR, Message, ORANGE, SUBTITLE_COLOR, quiz};
 
 // WWM dark navy colors
 const WWM_BG: Color = Color::from_rgb(0.08, 0.12, 0.22);
@@ -84,7 +82,6 @@ pub struct QuizSlides;
 
 impl QuizSlides {
     fn view_quiz<'a>(
-        ctx: ScaleCtx,
         question: &'a str,
         options: &'a [(&'a str, Message)],
         answer: Option<u8>,
@@ -104,13 +101,10 @@ impl QuizSlides {
                 let answered = answer.is_some();
 
                 let content = row![
-                    text(LETTERS[i])
-                        .size(ctx.sz(24))
-                        .font(FIRA_MONO)
-                        .color(ORANGE),
-                    text(*label).size(ctx.sz(24)).color(Color::WHITE),
+                    text(LETTERS[i]).size(24).font(FIRA_MONO).color(ORANGE),
+                    text(*label).size(24).color(Color::WHITE),
                 ]
-                .spacing(ctx.sp(10.0))
+                .spacing(10.0)
                 .align_y(iced::Alignment::Center);
 
                 button(content)
@@ -128,37 +122,27 @@ impl QuizSlides {
         let c = buttons.next().unwrap();
         let d = buttons.next().unwrap();
 
-        let grid = column![
-            row![a, b].spacing(ctx.sp(16.0)),
-            row![c, d].spacing(ctx.sp(16.0)),
-        ]
-        .spacing(ctx.sp(16.0));
+        let grid = column![row![a, b].spacing(16.0), row![c, d].spacing(16.0),].spacing(16.0);
 
         let feedback: Element<'_, Message> = match answer {
             None => text("Select an answer")
-                .size(ctx.sz(22))
+                .size(22)
                 .color(SUBTITLE_COLOR)
                 .into(),
             Some(idx) => {
                 if let Some((_, fb, is_correct)) = feedbacks.iter().find(|(i, _, _)| *i == idx) {
                     let icon: Element<'_, Message> = if *is_correct {
-                        icon_circle_check()
-                            .size(ctx.sz(24))
-                            .color(CORRECT_COLOR)
-                            .into()
+                        icon_circle_check().size(24).color(CORRECT_COLOR).into()
                     } else {
-                        icon_circle_x()
-                            .size(ctx.sz(24))
-                            .color(INCORRECT_COLOR)
-                            .into()
+                        icon_circle_x().size(24).color(INCORRECT_COLOR).into()
                     };
                     let color = if *is_correct {
                         CORRECT_COLOR
                     } else {
                         INCORRECT_COLOR
                     };
-                    row![icon, text(*fb).size(ctx.sz(22)).color(color)]
-                        .spacing(ctx.sp(8.0))
+                    row![icon, text(*fb).size(22).color(color)]
+                        .spacing(8.0)
                         .align_y(iced::Alignment::Center)
                         .into()
                 } else {
@@ -169,14 +153,14 @@ impl QuizSlides {
 
         container(
             column![
-                text(question).size(ctx.sz(38)).color(ORANGE),
-                space().height(ctx.sp(30.0)),
+                text(question).size(38).color(ORANGE),
+                space().height(30.0),
                 grid,
-                space().height(ctx.sp(20.0)),
+                space().height(20.0),
                 feedback,
             ]
-            .spacing(ctx.sp(10.0))
-            .padding(ctx.sp(20.0)),
+            .spacing(10.0)
+            .padding(20.0),
         )
         .width(iced::Fill)
         .height(iced::Fill)
@@ -185,9 +169,8 @@ impl QuizSlides {
         .into()
     }
 
-    pub fn view_quiz_screen(ctx: ScaleCtx, quiz: &quiz::Quiz) -> Element<'_, Message> {
+    pub fn view_quiz_screen(quiz: &quiz::Quiz) -> Element<'_, Message> {
         Self::view_quiz(
-            ctx,
             "Where should validation of a text input happen?",
             &[
                 ("In the View", Message::Quiz(quiz::Message::Answer(0))),
@@ -221,9 +204,8 @@ impl QuizSlides {
         )
     }
 
-    pub fn view_quiz_http(ctx: ScaleCtx, quiz: &quiz::Quiz) -> Element<'_, Message> {
+    pub fn view_quiz_http(quiz: &quiz::Quiz) -> Element<'_, Message> {
         Self::view_quiz(
-            ctx,
             "Where should you make an HTTP request?",
             &[
                 ("In the View", Message::Quiz(quiz::Message::HttpAnswer(0))),
@@ -263,9 +245,8 @@ impl QuizSlides {
         )
     }
 
-    pub fn view_quiz_button(ctx: ScaleCtx, quiz: &quiz::Quiz) -> Element<'_, Message> {
+    pub fn view_quiz_button(quiz: &quiz::Quiz) -> Element<'_, Message> {
         Self::view_quiz(
-            ctx,
             "How do you disable a button when a field is empty?",
             &[
                 (
@@ -311,9 +292,8 @@ impl QuizSlides {
         )
     }
 
-    pub fn view_quiz_validation(ctx: ScaleCtx, quiz: &quiz::Quiz) -> Element<'_, Message> {
+    pub fn view_quiz_validation(quiz: &quiz::Quiz) -> Element<'_, Message> {
         Self::view_quiz(
-            ctx,
             "How does input validation with error display work?",
             &[
                 (

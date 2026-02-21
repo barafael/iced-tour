@@ -4,7 +4,7 @@ use iced::{
 };
 use iced_anim::widget::button;
 
-use crate::{Message, SUBTITLE_COLOR, ScaleCtx, TEXT_SIZE, chaos, render_markdown};
+use crate::{Message, SUBTITLE_COLOR, TEXT_SIZE, chaos, render_markdown};
 
 const MD_SUBSCRIPTIONS: &str = r#"
 ```rust
@@ -32,25 +32,25 @@ impl Default for SubscriptionsSlide {
 }
 
 impl SubscriptionsSlide {
-    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
                 text("Subscriptions feed external (asynchronous) events into your app.")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(12.0)),
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(16.0)),
-                space().height(ctx.sp(8.0)),
+                    .size(TEXT_SIZE),
+                space().height(12.0),
+                render_markdown(&self.md, theme),
+                space().height(16.0),
+                space().height(8.0),
                 text("This slideshow listens to keyboard events.")
-                    .size(ctx.sz(TEXT_SIZE - 4))
+                    .size(TEXT_SIZE - 4)
                     .color(SUBTITLE_COLOR),
-                space().height(ctx.sp(16.0)),
+                space().height(16.0),
                 text("Other common uses: timers, window events, WebSocket messages.")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(12.0)),
+                    .size(TEXT_SIZE),
+                space().height(12.0),
                 button("🚨 Panic!").on_press(Message::Chaos(chaos::Message::PanicChaos)),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

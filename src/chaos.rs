@@ -90,8 +90,6 @@ impl<Message> canvas::Program<Message> for ChaosOverlay<'_> {
     }
 }
 
-// --- Composition pattern ---
-
 pub struct Chaos {
     circles: Vec<ChaosCircle>,
     paused: bool,
@@ -154,10 +152,5 @@ impl Chaos {
 
     pub fn circles(&self) -> &[ChaosCircle] {
         &self.circles
-    }
-
-    pub fn scale(&self) -> f32 {
-        let (w, h) = self.canvas_size;
-        (w / 1024.0).min(h / 768.0).max(0.5)
     }
 }

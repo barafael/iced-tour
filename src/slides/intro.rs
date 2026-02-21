@@ -3,7 +3,7 @@ use iced::{
     widget::{column, markdown, scrollable, space, svg},
 };
 
-use crate::{ELM_CIRCLE_OF_LIFE, Message, ScaleCtx, render_markdown};
+use crate::{ELM_CIRCLE_OF_LIFE, Message, render_markdown};
 
 const MD_INTRO: &str = r#"
 The **Elm Architecture** is a pattern for structuring interactive applications.
@@ -29,13 +29,13 @@ impl Default for IntroSlide {
 }
 
 impl IntroSlide {
-    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(30.0)),
-                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(ctx.sp(220.0)),
-                space().height(ctx.sp(30.0)),
+                render_markdown(&self.md, theme),
+                space().height(30.0),
+                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(220.0),
+                space().height(30.0),
             ]
             .align_x(iced::Alignment::Center),
         )

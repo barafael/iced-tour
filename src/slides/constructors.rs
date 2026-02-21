@@ -3,7 +3,7 @@ use iced::{
     widget::{column, markdown, scrollable, space, text},
 };
 
-use crate::{Message, SUBTITLE_COLOR, ScaleCtx, TEXT_SIZE, render_markdown};
+use crate::{Message, SUBTITLE_COLOR, TEXT_SIZE, render_markdown};
 
 const MD_CONSTRUCTORS: &str = r#"
 ```rust
@@ -37,20 +37,20 @@ impl Default for ConstructorsSlide {
 }
 
 impl ConstructorsSlide {
-    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Enum variants with data are enum constructors.").size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(8.0)),
-                render_markdown(&self.md_constructors, ctx, theme),
-                space().height(ctx.sp(16.0)),
+                text("Enum variants with data are enum constructors.").size(TEXT_SIZE),
+                space().height(8.0),
+                render_markdown(&self.md_constructors, theme),
+                space().height(16.0),
                 text("Widgets pass their state into these constructors:")
-                    .size(ctx.sz(TEXT_SIZE))
+                    .size(TEXT_SIZE)
                     .color(SUBTITLE_COLOR),
-                space().height(ctx.sp(8.0)),
-                render_markdown(&self.md_widget_messages, ctx, theme),
+                space().height(8.0),
+                render_markdown(&self.md_widget_messages, theme),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

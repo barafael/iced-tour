@@ -3,7 +3,7 @@ use iced::{
     widget::{column, markdown, scrollable, space, text, text_input},
 };
 
-use crate::{Message, ScaleCtx, TEXT_SIZE, demo, render_markdown};
+use crate::{Message, TEXT_SIZE, demo, render_markdown};
 
 const MD_TEXT_INPUT: &str = r#"
 ```rust
@@ -26,27 +26,21 @@ impl Default for TextInputSlide {
 }
 
 impl TextInputSlide {
-    pub fn view<'a>(
-        &'a self,
-        ctx: ScaleCtx,
-        theme: &Theme,
-        demo: &demo::Demo,
-    ) -> Element<'a, Message> {
+    pub fn view<'a>(&'a self, theme: &Theme, demo: &demo::Demo) -> Element<'a, Message> {
         scrollable(
             column![
-                text("The Text Input widget produces messages as the user types.")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(8.0)),
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(20.0)),
+                text("The Text Input widget produces messages as the user types.").size(TEXT_SIZE),
+                space().height(8.0),
+                render_markdown(&self.md, theme),
+                space().height(20.0),
                 text_input("Enter URL (e.g. example.com)", demo.input_text())
                     .on_input(|s| Message::Demo(demo::Message::InputChanged(s)))
                     .on_submit(Message::Demo(demo::Message::InputSubmitted)),
-                space().height(ctx.sp(12.0)),
-                text!("Input Changed messages: {}", demo.input_changes()).size(ctx.sz(TEXT_SIZE)),
-                text!("Input Submitted messages: {}", demo.input_submits()).size(ctx.sz(TEXT_SIZE)),
+                space().height(12.0),
+                text!("Input Changed messages: {}", demo.input_changes()).size(TEXT_SIZE),
+                text!("Input Submitted messages: {}", demo.input_submits()).size(TEXT_SIZE),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

@@ -3,7 +3,7 @@ use iced::{
     widget::{column, container, markdown, row, scrollable, slider, space, text},
 };
 
-use crate::{FIRA_MONO, Message, SUBTITLE_COLOR, ScaleCtx, TEXT_SIZE, demo, render_markdown};
+use crate::{FIRA_MONO, Message, SUBTITLE_COLOR, TEXT_SIZE, demo, render_markdown};
 
 const MD_ROW_COL: &str = r#"
 ```rust
@@ -56,17 +56,17 @@ impl Default for LayoutSlide {
 }
 
 impl LayoutSlide {
-    pub fn view_row_col(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view_row_col(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The building blocks of layout.").size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(12.0)),
-                render_markdown(&self.md_row_col, ctx, theme),
-                space().height(ctx.sp(20.0)),
-                space().height(ctx.sp(10.0)),
+                text("The building blocks of layout.").size(TEXT_SIZE),
+                space().height(12.0),
+                render_markdown(&self.md_row_col, theme),
+                space().height(20.0),
+                space().height(10.0),
                 {
                     let cell = |color: Color| {
-                        let s = ctx.sp(50.0);
+                        let s = 50.0;
                         container(space())
                             .width(s)
                             .height(s)
@@ -86,39 +86,35 @@ impl LayoutSlide {
                     .clip(true)
                 },
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }
 
-    pub fn view_container(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view_container(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Container wraps content for positioning and styling.")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(12.0)),
-                render_markdown(&self.md_container, ctx, theme),
-                space().height(ctx.sp(20.0)),
-                text("Live example:")
-                    .size(ctx.sz(TEXT_SIZE))
-                    .color(SUBTITLE_COLOR),
-                space().height(ctx.sp(10.0)),
+                text("Container wraps content for positioning and styling.").size(TEXT_SIZE),
+                space().height(12.0),
+                render_markdown(&self.md_container, theme),
+                space().height(20.0),
+                text("Live example:").size(TEXT_SIZE).color(SUBTITLE_COLOR),
+                space().height(10.0),
                 container(
                     container(text("Centered and styled"))
-                        .padding(ctx.sp(20.0))
+                        .padding(20.0)
                         .style(container::rounded_box),
                 )
                 .width(iced::Fill)
                 .center_x(iced::Fill),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }
 
     pub fn view_spacing(
         &self,
-        ctx: ScaleCtx,
         theme: &Theme,
         demo: &demo::Demo,
         shift_held: bool,
@@ -143,44 +139,44 @@ impl LayoutSlide {
 
         let spacing_slider = row![
             text(format!(".spacing({:.0})", sp))
-                .size(ctx.sz(22))
+                .size(22)
                 .font(FIRA_MONO),
             slider(0.0..=40.0, sp, |v| Message::Demo(
                 demo::Message::SpacingChanged(v)
             ))
-            .width(ctx.sp(200.0)),
+            .width(200.0),
         ]
-        .spacing(ctx.sp(12.0))
+        .spacing(12.0)
         .align_y(iced::Alignment::Center);
 
         let padding_slider = row![
             text(format!(".padding({:.0})", pd))
-                .size(ctx.sz(22))
+                .size(22)
                 .font(FIRA_MONO),
             slider(0.0..=40.0, pd, |v| Message::Demo(
                 demo::Message::PaddingChanged(v)
             ))
-            .width(ctx.sp(200.0)),
+            .width(200.0),
         ]
-        .spacing(ctx.sp(12.0))
+        .spacing(12.0)
         .align_y(iced::Alignment::Center);
 
         scrollable(
             column![
                 text("Control gaps and alignment with spacing, padding, and align.")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(12.0)),
-                render_markdown(&self.md_spacing, ctx, theme),
-                space().height(ctx.sp(20.0)),
-                row![spacing_slider, padding_slider].spacing(ctx.sp(20.0)),
-                space().height(ctx.sp(12.0)),
+                    .size(TEXT_SIZE),
+                space().height(12.0),
+                render_markdown(&self.md_spacing, theme),
+                space().height(20.0),
+                row![spacing_slider, padding_slider].spacing(20.0),
+                space().height(12.0),
                 preview,
-                space().height(ctx.sp(8.0)),
+                space().height(8.0),
                 text("hint: press shift")
-                    .size(ctx.sz(TEXT_SIZE - 4))
+                    .size(TEXT_SIZE - 4)
                     .color(SUBTITLE_COLOR),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

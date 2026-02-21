@@ -4,7 +4,7 @@ use iced::{
 };
 use iced_anim::widget::button;
 
-use crate::{Message, ScaleCtx, TEXT_SIZE, demo, render_markdown};
+use crate::{Message, TEXT_SIZE, demo, render_markdown};
 
 const MD_BUTTON: &str = r#"
 ```rust
@@ -25,12 +25,7 @@ impl Default for ButtonSlide {
 }
 
 impl ButtonSlide {
-    pub fn view<'a>(
-        &'a self,
-        ctx: ScaleCtx,
-        theme: &Theme,
-        demo: &demo::Demo,
-    ) -> Element<'a, Message> {
+    pub fn view<'a>(&'a self, theme: &Theme, demo: &demo::Demo) -> Element<'a, Message> {
         let click_text = if demo.button_clicks() == 0 {
             String::from("Click the button!")
         } else {
@@ -43,18 +38,18 @@ impl ButtonSlide {
 
         scrollable(
             column![
-                text("The Button widget produces messages when clicked.").size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(8.0)),
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(20.0)),
+                text("The Button widget produces messages when clicked.").size(TEXT_SIZE),
+                space().height(8.0),
+                render_markdown(&self.md, theme),
+                space().height(20.0),
                 row![
                     button("Get").on_press(Message::Demo(demo::Message::ButtonClicked)),
-                    text(click_text).size(ctx.sz(TEXT_SIZE)),
+                    text(click_text).size(TEXT_SIZE),
                 ]
-                .spacing(ctx.sp(15.0))
+                .spacing(15.0)
                 .align_y(iced::Alignment::Center),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

@@ -5,7 +5,7 @@ use iced::{
 };
 use iced_anim::widget::button;
 
-use crate::{Message, SUBTITLE_COLOR, ScaleCtx, TEXT_SIZE, render_markdown, theming};
+use crate::{Message, SUBTITLE_COLOR, TEXT_SIZE, render_markdown, theming};
 
 const MD_VIEW: &str = r#"
 ```rust
@@ -32,24 +32,23 @@ impl Default for ViewSlide {
 }
 
 impl ViewSlide {
-    pub fn view_view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view_view(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The View visualizes the application state.").size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(12.0)),
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(12.0)),
-                text("Notice the method signature: &self (immutable borrow).")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(8.0)),
-                text("The View can read state but never modify it.").size(ctx.sz(TEXT_SIZE)),
+                text("The View visualizes the application state.").size(TEXT_SIZE),
+                space().height(12.0),
+                render_markdown(&self.md, theme),
+                space().height(12.0),
+                text("Notice the method signature: &self (immutable borrow).").size(TEXT_SIZE),
+                space().height(8.0),
+                text("The View can read state but never modify it.").size(TEXT_SIZE),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }
 
-    pub fn view_theming(&self, ctx: ScaleCtx, theming: &theming::Theming) -> Element<'_, Message> {
+    pub fn view_theming(&self, theming: &theming::Theming) -> Element<'_, Message> {
         let hover_color = theming.hover_color();
 
         let swatch =
@@ -69,9 +68,9 @@ impl ViewSlide {
             |c| Message::Theming(theming::Message::SubmitColor(c)),
         );
 
-        let demo_button = button(text("Hover me").size(ctx.sz(TEXT_SIZE)))
+        let demo_button = button(text("Hover me").size(TEXT_SIZE))
             .on_press(Message::Noop)
-            .padding(ctx.sp(16.0))
+            .padding(16.0)
             .style(move |theme: &Theme, status| match status {
                 iced_button::Status::Hovered => iced_button::Style {
                     background: Some(hover_color.into()),
@@ -84,75 +83,70 @@ impl ViewSlide {
         scrollable(
             column![
                 text("Every widget has a .style() method. Pick a hover color for the button:")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(20.0)),
+                    .size(TEXT_SIZE),
+                space().height(20.0),
                 row![
                     column![
                         text("Click to pick a color:")
-                            .size(ctx.sz(TEXT_SIZE - 4))
+                            .size(TEXT_SIZE - 4)
                             .color(SUBTITLE_COLOR),
-                        space().height(ctx.sp(8.0)),
+                        space().height(8.0),
                         picker,
                     ],
-                    space().width(ctx.sp(40.0)),
+                    space().width(40.0),
                     column![
                         text("Styled button:")
-                            .size(ctx.sz(TEXT_SIZE - 4))
+                            .size(TEXT_SIZE - 4)
                             .color(SUBTITLE_COLOR),
-                        space().height(ctx.sp(8.0)),
+                        space().height(8.0),
                         demo_button,
                     ],
                 ]
                 .align_y(iced::Alignment::Start),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }
 
-    pub fn view_theme_picker<'a>(
-        &self,
-        ctx: ScaleCtx,
-        theming: &'a theming::Theming,
-    ) -> Element<'a, Message> {
+    pub fn view_theme_picker<'a>(&self, theming: &'a theming::Theming) -> Element<'a, Message> {
         scrollable(
             column![
-                text("Iced ships with built-in themes you can switch at runtime.")
-                    .size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(20.0)),
+                text("Iced ships with built-in themes you can switch at runtime.").size(TEXT_SIZE),
+                space().height(20.0),
                 row![
-                    text("Theme:").size(ctx.sz(TEXT_SIZE)),
+                    text("Theme:").size(TEXT_SIZE),
                     pick_list(Theme::ALL, Some(theming.theme()), |t| Message::Theming(
                         theming::Message::ThemeChanged(t)
                     ),),
                 ]
-                .spacing(ctx.sp(12.0))
+                .spacing(12.0)
                 .align_y(iced::Alignment::Center),
-                space().height(ctx.sp(24.0)),
+                space().height(24.0),
                 text("Sample widgets with the current theme:")
-                    .size(ctx.sz(TEXT_SIZE - 4))
+                    .size(TEXT_SIZE - 4)
                     .color(SUBTITLE_COLOR),
-                space().height(ctx.sp(12.0)),
+                space().height(12.0),
                 row![
-                    button(text("Default").size(ctx.sz(TEXT_SIZE - 2)))
+                    button(text("Default").size(TEXT_SIZE - 2))
                         .on_press(Message::Noop)
-                        .padding(ctx.sp(12.0)),
-                    button(text("Primary").size(ctx.sz(TEXT_SIZE - 2)))
+                        .padding(12.0),
+                    button(text("Primary").size(TEXT_SIZE - 2))
                         .on_press(Message::Noop)
-                        .padding(ctx.sp(12.0))
+                        .padding(12.0)
                         .style(iced_button::primary),
-                    button(text("Secondary").size(ctx.sz(TEXT_SIZE - 2)))
+                    button(text("Secondary").size(TEXT_SIZE - 2))
                         .on_press(Message::Noop)
-                        .padding(ctx.sp(12.0))
+                        .padding(12.0)
                         .style(iced_button::secondary),
-                    button(text("Danger").size(ctx.sz(TEXT_SIZE - 2)))
+                    button(text("Danger").size(TEXT_SIZE - 2))
                         .on_press(Message::Noop)
-                        .padding(ctx.sp(12.0))
+                        .padding(12.0)
                         .style(iced_button::danger),
                 ]
-                .spacing(ctx.sp(12.0)),
+                .spacing(12.0),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

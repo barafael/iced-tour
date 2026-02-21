@@ -3,7 +3,7 @@ use iced::{
     widget::{column, markdown, scrollable, space, text},
 };
 
-use crate::{Message, ScaleCtx, TEXT_SIZE, render_markdown};
+use crate::{Message, TEXT_SIZE, render_markdown};
 
 const MD_UPDATE: &str = r#"
 ```rust
@@ -32,16 +32,16 @@ impl Default for UpdateSlide {
 }
 
 impl UpdateSlide {
-    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Update modifies state based on messages.").size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(8.0)),
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(12.0)),
-                text("Notice the method signature! (&mut)").size(ctx.sz(TEXT_SIZE)),
+                text("Update modifies state based on messages.").size(TEXT_SIZE),
+                space().height(8.0),
+                render_markdown(&self.md, theme),
+                space().height(12.0),
+                text("Notice the method signature! (&mut)").size(TEXT_SIZE),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }

@@ -3,7 +3,7 @@ use iced::{
     widget::{column, markdown, scrollable, space, text},
 };
 
-use crate::{Message, ScaleCtx, TEXT_SIZE, render_markdown};
+use crate::{Message, TEXT_SIZE, render_markdown};
 
 const MD_MODEL: &str = r#"
 ```rust
@@ -34,16 +34,16 @@ impl Default for ModelSlide {
 }
 
 impl ModelSlide {
-    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
+    pub fn view(&self, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The Model holds application state.").size(ctx.sz(TEXT_SIZE)),
-                space().height(ctx.sp(12.0)),
-                render_markdown(&self.md, ctx, theme),
-                space().height(ctx.sp(12.0)),
-                text("Notice: completely UI-agnostic.").size(ctx.sz(TEXT_SIZE)),
+                text("The Model holds application state.").size(TEXT_SIZE),
+                space().height(12.0),
+                render_markdown(&self.md, theme),
+                space().height(12.0),
+                text("Notice: completely UI-agnostic.").size(TEXT_SIZE),
             ]
-            .spacing(ctx.sp(8.0)),
+            .spacing(8.0),
         )
         .into()
     }
