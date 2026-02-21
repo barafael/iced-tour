@@ -1,11 +1,11 @@
 use iced::{
-    Element,
-    widget::{column, scrollable, space, svg},
+    Element, Theme,
+    widget::{column, markdown, scrollable, space, svg},
 };
 
-use crate::{App, ELM_CIRCLE_OF_LIFE, Message};
+use crate::{ELM_CIRCLE_OF_LIFE, Message, ScaleCtx, render_markdown};
 
-pub const MD_INTRO: &str = r#"
+const MD_INTRO: &str = r#"
 The **Elm Architecture** is a pattern for structuring interactive applications.
 
 It separates concerns into four distinct parts:
@@ -16,14 +16,26 @@ It separates concerns into four distinct parts:
 4. **View** — transforms state into UI with event handlers
 "#;
 
-impl App {
-    pub fn view_intro_screen(&self) -> Element<'_, Message> {
+pub struct IntroSlide {
+    md: Vec<markdown::Item>,
+}
+
+impl Default for IntroSlide {
+    fn default() -> Self {
+        Self {
+            md: markdown::parse(MD_INTRO).collect(),
+        }
+    }
+}
+
+impl IntroSlide {
+    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                self.md_container(&self.md_intro),
-                space().height(self.sp(30.0)),
-                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(self.sp(220.0)),
-                space().height(self.sp(30.0)),
+                render_markdown(&self.md, ctx, theme),
+                space().height(ctx.sp(30.0)),
+                svg(svg::Handle::from_memory(ELM_CIRCLE_OF_LIFE)).height(ctx.sp(220.0)),
+                space().height(ctx.sp(30.0)),
             ]
             .align_x(iced::Alignment::Center),
         )

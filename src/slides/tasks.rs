@@ -1,11 +1,11 @@
 use iced::{
-    Element,
-    widget::{column, scrollable, space, text},
+    Element, Theme,
+    widget::{column, markdown, scrollable, space, text},
 };
 
-use crate::{App, Message, TEXT_SIZE};
+use crate::{Message, ScaleCtx, TEXT_SIZE, render_markdown};
 
-pub const MD_TASKS: &str = r#"
+const MD_TASKS: &str = r#"
 ```rust
 fn update(&mut self, message: Message) -> Task<Message> {
     ...
@@ -20,24 +20,36 @@ fn update(&mut self, message: Message) -> Task<Message> {
 ```
 "#;
 
-impl App {
-    pub fn view_tasks_screen(&self) -> Element<'_, Message> {
+pub struct TasksSlide {
+    md: Vec<markdown::Item>,
+}
+
+impl Default for TasksSlide {
+    fn default() -> Self {
+        Self {
+            md: markdown::parse(MD_TASKS).collect(),
+        }
+    }
+}
+
+impl TasksSlide {
+    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
                 text("The update function may produce a Task for async background operations.")
-                    .size(self.sz(TEXT_SIZE)),
-                space().height(self.sp(8.0)),
-                self.md_container(&self.md_tasks),
-                space().height(self.sp(12.0)),
+                    .size(ctx.sz(TEXT_SIZE)),
+                space().height(ctx.sp(8.0)),
+                render_markdown(&self.md, ctx, theme),
+                space().height(ctx.sp(12.0)),
                 text("Task::perform takes an async function and a message constructor.")
-                    .size(self.sz(TEXT_SIZE)),
-                space().height(self.sp(8.0)),
+                    .size(ctx.sz(TEXT_SIZE)),
+                space().height(ctx.sp(8.0)),
                 text(
                     "When the async work completes, the result is usually wrapped in the message."
                 )
-                .size(self.sz(TEXT_SIZE)),
+                .size(ctx.sz(TEXT_SIZE)),
             ]
-            .spacing(self.sp(8.0)),
+            .spacing(ctx.sp(8.0)),
         )
         .into()
     }

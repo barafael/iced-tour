@@ -1,11 +1,11 @@
 use iced::{
-    Element,
-    widget::{column, scrollable, space, text},
+    Element, Theme,
+    widget::{column, markdown, scrollable, space, text},
 };
 
-use crate::{App, Message, SUBTITLE_COLOR, TEXT_SIZE};
+use crate::{Message, SUBTITLE_COLOR, ScaleCtx, TEXT_SIZE, render_markdown};
 
-pub const MD_CONSTRUCTORS: &str = r#"
+const MD_CONSTRUCTORS: &str = r#"
 ```rust
 // these two are equivalent:
 .on_input(Message::UrlChanged)
@@ -13,7 +13,7 @@ pub const MD_CONSTRUCTORS: &str = r#"
 ```
 "#;
 
-pub const MD_WIDGET_MESSAGES: &str = r#"
+const MD_WIDGET_MESSAGES: &str = r#"
 ```rust
 // Each widget sends its state into your Message:
 text_input(..).on_input(f)    // f: impl Fn(String) -> Message
@@ -22,21 +22,35 @@ button(..).on_press(message)  // f: impl Fn(()) -> Message
 ```
 "#;
 
-impl App {
-    pub fn view_constructors_screen(&self) -> Element<'_, Message> {
+pub struct ConstructorsSlide {
+    md_constructors: Vec<markdown::Item>,
+    md_widget_messages: Vec<markdown::Item>,
+}
+
+impl Default for ConstructorsSlide {
+    fn default() -> Self {
+        Self {
+            md_constructors: markdown::parse(MD_CONSTRUCTORS).collect(),
+            md_widget_messages: markdown::parse(MD_WIDGET_MESSAGES).collect(),
+        }
+    }
+}
+
+impl ConstructorsSlide {
+    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Enum variants with data are enum constructors.").size(self.sz(TEXT_SIZE)),
-                space().height(self.sp(8.0)),
-                self.md_container(&self.md_constructors),
-                space().height(self.sp(16.0)),
+                text("Enum variants with data are enum constructors.").size(ctx.sz(TEXT_SIZE)),
+                space().height(ctx.sp(8.0)),
+                render_markdown(&self.md_constructors, ctx, theme),
+                space().height(ctx.sp(16.0)),
                 text("Widgets pass their state into these constructors:")
-                    .size(self.sz(TEXT_SIZE))
+                    .size(ctx.sz(TEXT_SIZE))
                     .color(SUBTITLE_COLOR),
-                space().height(self.sp(8.0)),
-                self.md_container(&self.md_widget_messages),
+                space().height(ctx.sp(8.0)),
+                render_markdown(&self.md_widget_messages, ctx, theme),
             ]
-            .spacing(self.sp(8.0)),
+            .spacing(ctx.sp(8.0)),
         )
         .into()
     }

@@ -1,9 +1,9 @@
 #[derive(Default)]
 pub struct Quiz {
-    pub answer: Option<u8>,
-    pub http_answer: Option<u8>,
-    pub button_answer: Option<u8>,
-    pub validation_answer: Option<u8>,
+    answer: Option<u8>,
+    http_answer: Option<u8>,
+    button_answer: Option<u8>,
+    validation_answer: Option<u8>,
 }
 
 #[derive(Debug, Clone)]
@@ -28,5 +28,21 @@ impl Quiz {
             Message::ValidationAnswer(a) => self.validation_answer = Some(a),
         }
         Action::None
+    }
+
+    pub fn answer(&self) -> Option<u8> {
+        self.answer
+    }
+
+    pub fn http_answer(&self) -> Option<u8> {
+        self.http_answer
+    }
+
+    pub fn button_answer(&self) -> Option<u8> {
+        self.button_answer
+    }
+
+    pub fn validation_answer(&self) -> Option<u8> {
+        self.validation_answer
     }
 }

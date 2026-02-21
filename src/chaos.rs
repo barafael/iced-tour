@@ -93,9 +93,9 @@ impl<Message> canvas::Program<Message> for ChaosOverlay<'_> {
 // --- Composition pattern ---
 
 pub struct Chaos {
-    pub circles: Vec<ChaosCircle>,
-    pub paused: bool,
-    pub canvas_size: (f32, f32),
+    circles: Vec<ChaosCircle>,
+    paused: bool,
+    canvas_size: (f32, f32),
 }
 
 #[derive(Debug, Clone)]
@@ -150,6 +150,10 @@ impl Chaos {
     pub fn clear_and_unpause(&mut self) {
         self.circles.clear();
         self.paused = false;
+    }
+
+    pub fn circles(&self) -> &[ChaosCircle] {
+        &self.circles
     }
 
     pub fn scale(&self) -> f32 {

@@ -1,11 +1,11 @@
 use iced::{
-    Element,
-    widget::{column, scrollable, space, text},
+    Element, Theme,
+    widget::{column, markdown, scrollable, space, text},
 };
 
-use crate::{App, Message, TEXT_SIZE};
+use crate::{Message, ScaleCtx, TEXT_SIZE, render_markdown};
 
-pub const MD_UPDATE: &str = r#"
+const MD_UPDATE: &str = r#"
 ```rust
 fn update(&mut self, message: Message) {
     match message {
@@ -19,17 +19,29 @@ fn update(&mut self, message: Message) {
 ```
 "#;
 
-impl App {
-    pub fn view_update_screen(&self) -> Element<'_, Message> {
+pub struct UpdateSlide {
+    md: Vec<markdown::Item>,
+}
+
+impl Default for UpdateSlide {
+    fn default() -> Self {
+        Self {
+            md: markdown::parse(MD_UPDATE).collect(),
+        }
+    }
+}
+
+impl UpdateSlide {
+    pub fn view(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("Update modifies state based on messages.").size(self.sz(TEXT_SIZE)),
-                space().height(self.sp(8.0)),
-                self.md_container(&self.md_update),
-                space().height(self.sp(12.0)),
-                text("Notice the method signature! (&mut)").size(self.sz(TEXT_SIZE)),
+                text("Update modifies state based on messages.").size(ctx.sz(TEXT_SIZE)),
+                space().height(ctx.sp(8.0)),
+                render_markdown(&self.md, ctx, theme),
+                space().height(ctx.sp(12.0)),
+                text("Notice the method signature! (&mut)").size(ctx.sz(TEXT_SIZE)),
             ]
-            .spacing(self.sp(8.0)),
+            .spacing(ctx.sp(8.0)),
         )
         .into()
     }

@@ -1,9 +1,9 @@
 use iced::{Color, Theme};
 
 pub struct Theming {
-    pub hover_color: Color,
-    pub show_color_picker: bool,
-    pub theme: Theme,
+    hover_color: Color,
+    show_color_picker: bool,
+    theme: Theme,
 }
 
 #[derive(Debug, Clone)]
@@ -16,7 +16,7 @@ pub enum Message {
 
 pub enum Action {
     None,
-    ThemeChanged(Theme),
+    ThemeChanged,
 }
 
 impl Default for Theming {
@@ -47,9 +47,21 @@ impl Theming {
                 Action::None
             }
             Message::ThemeChanged(theme) => {
-                self.theme = theme.clone();
-                Action::ThemeChanged(theme)
+                self.theme = theme;
+                Action::ThemeChanged
             }
         }
+    }
+
+    pub fn hover_color(&self) -> Color {
+        self.hover_color
+    }
+
+    pub fn show_color_picker(&self) -> bool {
+        self.show_color_picker
+    }
+
+    pub fn theme(&self) -> &Theme {
+        &self.theme
     }
 }

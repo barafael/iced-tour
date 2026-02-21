@@ -1,9 +1,11 @@
 use iced::Element;
 
-use crate::{App, Message};
+use crate::Message;
 
-impl App {
-    pub fn view_interactive_screen(&self) -> Element<'_, Message> {
-        self.page_boop.view().map(Message::PageBoop)
+pub struct InteractiveSlide;
+
+impl InteractiveSlide {
+    pub fn view<'a>(&self, page_boop: &'a page_boop::PageBoop) -> Element<'a, Message> {
+        page_boop.view().map(Message::PageBoop)
     }
 }

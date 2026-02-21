@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use iced::{
     Color, Element, Event, Font, Padding, Subscription, Task, Theme, event, keyboard,
     widget::{canvas, column, container, markdown, pick_list, row, space, stack, text, themer},
@@ -38,32 +40,75 @@ pub const INCORRECT_COLOR: Color = Color::from_rgb(0.85, 0.25, 0.25);
 
 pub const ELM_CIRCLE_OF_LIFE: &[u8] = include_bytes!("../assets/elm.svg");
 
-pub struct App {
-    pub navigation: navigation::Navigation,
-    pub demo: demo::Demo,
-    pub theming: theming::Theming,
-    pub chaos: chaos::Chaos,
-    pub quiz: quiz::Quiz,
-    pub page_boop: page_boop::PageBoop,
-    pub terminal: terminal::Terminal,
-    pub ctrl_held: bool,
-    pub shift_held: bool,
+const TICK_INTERVAL: Duration = Duration::from_millis(16);
+const CHAOS_SPAWN_INTERVAL: Duration = Duration::from_secs(3);
 
-    // Cached markdown content for each screen
-    pub md_intro: Vec<markdown::Item>,
-    pub md_model: Vec<markdown::Item>,
-    pub md_view: Vec<markdown::Item>,
-    pub md_row_col: Vec<markdown::Item>,
-    pub md_container: Vec<markdown::Item>,
-    pub md_spacing: Vec<markdown::Item>,
-    pub md_button: Vec<markdown::Item>,
-    pub md_text_input: Vec<markdown::Item>,
-    pub md_message: Vec<markdown::Item>,
-    pub md_update: Vec<markdown::Item>,
-    pub md_tasks: Vec<markdown::Item>,
-    pub md_subscriptions: Vec<markdown::Item>,
-    pub md_constructors: Vec<markdown::Item>,
-    pub md_widget_messages: Vec<markdown::Item>,
+// --- Scaling context ---
+
+#[derive(Clone, Copy)]
+pub struct ScaleCtx {
+    scale: f32,
+}
+
+impl ScaleCtx {
+    pub fn new(scale: f32) -> Self {
+        Self { scale }
+    }
+
+    pub fn sz(&self, base: u32) -> u32 {
+        ((base as f32) * self.scale) as u32
+    }
+
+    pub fn sp(&self, base: f32) -> f32 {
+        base * self.scale
+    }
+}
+
+pub fn render_markdown<'a>(
+    md: &'a [markdown::Item],
+    ctx: ScaleCtx,
+    theme: &Theme,
+) -> Element<'a, Message> {
+    let mut settings = markdown::Settings::with_text_size(ctx.sz(TEXT_SIZE), theme.clone());
+    settings.code_size = ctx.sz(CODE_SIZE).into();
+    let md_view: Element<'a, Message, AppTheme, _> =
+        markdown::view(md, settings).map(|_| Message::Noop);
+    themer(Some(AppTheme(theme.clone())), md_view).into()
+}
+
+// --- App ---
+
+pub struct App {
+    // Components
+    navigation: navigation::Navigation,
+    demo: demo::Demo,
+    theming: theming::Theming,
+    chaos: chaos::Chaos,
+    quiz: quiz::Quiz,
+    page_boop: page_boop::PageBoop,
+    terminal: terminal::Terminal,
+
+    // Input state
+    ctrl_held: bool,
+    shift_held: bool,
+
+    // Slide state (each slide owns its cached markdown)
+    title_slide: slides::title::TitleSlide,
+    intro_slide: slides::intro::IntroSlide,
+    model_slide: slides::model::ModelSlide,
+    view_slide: slides::view::ViewSlide,
+    layout_slide: slides::layout::LayoutSlide,
+    button_slide: slides::button::ButtonSlide,
+    text_input_slide: slides::text_input::TextInputSlide,
+    message_slide: slides::message::MessageSlide,
+    constructors_slide: slides::constructors::ConstructorsSlide,
+    update_slide: slides::update::UpdateSlide,
+    tasks_slide: slides::tasks::TasksSlide,
+    subscriptions_slide: slides::subscriptions::SubscriptionsSlide,
+    interactive_slide: slides::interactive::InteractiveSlide,
+    community_widgets_slide: slides::community_widgets::CommunityWidgetsSlide,
+
+    recap_slide: slides::recap::RecapSlide,
 }
 
 impl Default for App {
@@ -82,20 +127,21 @@ impl Default for App {
             terminal: terminal::Terminal::new(FIRA_MONO),
             ctrl_held: false,
             shift_held: false,
-            md_intro: markdown::parse(slides::intro::MD_INTRO).collect(),
-            md_model: markdown::parse(slides::model::MD_MODEL).collect(),
-            md_view: markdown::parse(slides::view::MD_VIEW).collect(),
-            md_row_col: markdown::parse(slides::layout::MD_ROW_COL).collect(),
-            md_container: markdown::parse(slides::layout::MD_CONTAINER).collect(),
-            md_spacing: markdown::parse(slides::layout::MD_SPACING).collect(),
-            md_button: markdown::parse(slides::button::MD_BUTTON).collect(),
-            md_text_input: markdown::parse(slides::text_input::MD_TEXT_INPUT).collect(),
-            md_message: markdown::parse(slides::message::MD_MESSAGE).collect(),
-            md_update: markdown::parse(slides::update::MD_UPDATE).collect(),
-            md_tasks: markdown::parse(slides::tasks::MD_TASKS).collect(),
-            md_subscriptions: markdown::parse(slides::subscriptions::MD_SUBSCRIPTIONS).collect(),
-            md_constructors: markdown::parse(slides::constructors::MD_CONSTRUCTORS).collect(),
-            md_widget_messages: markdown::parse(slides::constructors::MD_WIDGET_MESSAGES).collect(),
+            title_slide: slides::title::TitleSlide,
+            intro_slide: slides::intro::IntroSlide::default(),
+            model_slide: slides::model::ModelSlide::default(),
+            view_slide: slides::view::ViewSlide::default(),
+            layout_slide: slides::layout::LayoutSlide::default(),
+            button_slide: slides::button::ButtonSlide::default(),
+            text_input_slide: slides::text_input::TextInputSlide::default(),
+            message_slide: slides::message::MessageSlide::default(),
+            constructors_slide: slides::constructors::ConstructorsSlide::default(),
+            update_slide: slides::update::UpdateSlide::default(),
+            tasks_slide: slides::tasks::TasksSlide::default(),
+            subscriptions_slide: slides::subscriptions::SubscriptionsSlide::default(),
+            interactive_slide: slides::interactive::InteractiveSlide,
+            community_widgets_slide: slides::community_widgets::CommunityWidgetsSlide,
+            recap_slide: slides::recap::RecapSlide,
         }
     }
 }
@@ -134,7 +180,11 @@ fn main() -> iced::Result {
 
 impl App {
     fn theme(&self) -> Theme {
-        self.theming.theme.clone()
+        self.theming.theme().clone()
+    }
+
+    fn scale_ctx(&self) -> ScaleCtx {
+        ScaleCtx::new(self.chaos.scale())
     }
 
     fn subscription(&self) -> Subscription<Message> {
@@ -172,24 +222,25 @@ impl App {
             _ => None,
         });
 
-        let screen = self.navigation.screen;
-        let needs_tick = screen == Slide::Subscriptions || self.navigation.is_animating();
-
+        let screen = self.navigation.screen();
         let term_sub = self.terminal.subscription().map(Message::Terminal);
 
-        if screen == Slide::Subscriptions {
-            let tick = iced::time::every(std::time::Duration::from_millis(16))
-                .map(|_| Message::Chaos(chaos::Message::Tick));
-            let spawn_timer = iced::time::every(std::time::Duration::from_secs(3))
-                .map(|_| Message::Chaos(chaos::Message::SpawnChaos));
-            Subscription::batch([events, tick, spawn_timer, term_sub])
-        } else if needs_tick {
-            let tick = iced::time::every(std::time::Duration::from_millis(16))
-                .map(|_| Message::Chaos(chaos::Message::Tick));
-            Subscription::batch([events, tick, term_sub])
-        } else {
-            Subscription::batch([events, term_sub])
+        let mut subs = vec![events, term_sub];
+
+        if screen == Slide::Subscriptions || self.navigation.is_animating() {
+            subs.push(
+                iced::time::every(TICK_INTERVAL).map(|_| Message::Chaos(chaos::Message::Tick)),
+            );
         }
+
+        if screen == Slide::Subscriptions {
+            subs.push(
+                iced::time::every(CHAOS_SPAWN_INTERVAL)
+                    .map(|_| Message::Chaos(chaos::Message::SpawnChaos)),
+            );
+        }
+
+        Subscription::batch(subs)
     }
 
     fn update(&mut self, message: Message) -> Task<Message> {
@@ -216,7 +267,7 @@ impl App {
             Message::Theming(msg) => {
                 match self.theming.update(msg) {
                     theming::Action::None => {}
-                    theming::Action::ThemeChanged(_) => {}
+                    theming::Action::ThemeChanged => {}
                 }
                 Task::none()
             }
@@ -267,41 +318,48 @@ impl App {
     }
 
     fn view(&self) -> Element<'_, Message> {
-        let screen = self.navigation.screen;
+        let screen = self.navigation.screen();
+        let ctx = self.scale_ctx();
+        let theme = self.theming.theme();
 
         let title = text(screen.to_string())
-            .size(self.sz(38))
+            .size(ctx.sz(38))
             .font(FIRA_MONO)
             .color(ORANGE);
 
         let content: Element<Message> = match screen {
-            Slide::Title => self.view_title_screen(),
-            Slide::Intro => self.view_intro_screen(),
-            Slide::Model => self.view_model_screen(),
-            Slide::View => self.view_view_screen(),
-            Slide::LayoutRowCol => self.view_layout_row_col_screen(),
-            Slide::LayoutContainer => self.view_layout_container_screen(),
-            Slide::LayoutSpacing => self.view_layout_spacing_screen(),
-            Slide::Button => self.view_button_screen(),
-            Slide::TextInput => self.view_text_input_screen(),
-            Slide::Theming => self.view_theming_screen(),
-            Slide::ThemePicker => self.view_theme_picker_screen(),
-            Slide::Message => self.view_message_screen(),
-            Slide::Constructors => self.view_constructors_screen(),
-            Slide::Update => self.view_update_screen(),
-            Slide::Tasks => self.view_tasks_screen(),
-            Slide::Subscriptions => self.view_subscriptions_screen(),
-            Slide::Interactive => self.view_interactive_screen(),
-            Slide::CommunityWidgets => self.view_community_widgets_screen(),
-            Slide::Quiz => self.view_quiz_screen(),
-            Slide::QuizHttp => self.view_quiz_http_screen(),
-            Slide::QuizButton => self.view_quiz_button_screen(),
-            Slide::QuizValidation => self.view_quiz_validation_screen(),
-            Slide::Takeaways => self.view_takeaways_screen(),
-            Slide::Recap => self.view_recap_screen(),
+            Slide::Title => self.title_slide.view(ctx),
+            Slide::Intro => self.intro_slide.view(ctx, theme),
+            Slide::Model => self.model_slide.view(ctx, theme),
+            Slide::View => self.view_slide.view_view(ctx, theme),
+            Slide::LayoutRowCol => self.layout_slide.view_row_col(ctx, theme),
+            Slide::LayoutContainer => self.layout_slide.view_container(ctx, theme),
+            Slide::LayoutSpacing => {
+                self.layout_slide
+                    .view_spacing(ctx, theme, &self.demo, self.shift_held)
+            }
+            Slide::Button => self.button_slide.view(ctx, theme, &self.demo),
+            Slide::TextInput => self.text_input_slide.view(ctx, theme, &self.demo),
+            Slide::Theming => self.view_slide.view_theming(ctx, &self.theming),
+            Slide::ThemePicker => self.view_slide.view_theme_picker(ctx, &self.theming),
+            Slide::Message => self.message_slide.view(ctx, theme),
+            Slide::Constructors => self.constructors_slide.view(ctx, theme),
+            Slide::Update => self.update_slide.view(ctx, theme),
+            Slide::Tasks => self.tasks_slide.view(ctx, theme),
+            Slide::Subscriptions => self.subscriptions_slide.view(ctx, theme),
+            Slide::Interactive => self.interactive_slide.view(&self.page_boop),
+            Slide::CommunityWidgets => self.community_widgets_slide.view(ctx, &self.terminal),
+            Slide::Quiz => slides::quiz::QuizSlides::view_quiz_screen(ctx, &self.quiz),
+            Slide::QuizHttp => slides::quiz::QuizSlides::view_quiz_http(ctx, &self.quiz),
+            Slide::QuizButton => slides::quiz::QuizSlides::view_quiz_button(ctx, &self.quiz),
+            Slide::QuizValidation => {
+                slides::quiz::QuizSlides::view_quiz_validation(ctx, &self.quiz)
+            }
+            Slide::Takeaways => self.recap_slide.view_takeaways(ctx),
+            Slide::Recap => self.recap_slide.view_recap(ctx),
         };
 
-        let nav = self.view_navigation();
+        let nav = self.view_navigation(ctx);
         let nav_bar = container(nav).center_x(iced::Fill).padding(20);
 
         // Orange stripe at the top
@@ -313,11 +371,11 @@ impl App {
                     ..Default::default()
                 });
 
-        let offset = self.navigation.slide_offset.value();
+        let offset = self.navigation.slide_offset().value();
         let main_content = container(
             column![title, content]
-                .spacing(self.sp(20.0))
-                .padding(self.sp(30.0))
+                .spacing(ctx.sp(20.0))
+                .padding(ctx.sp(30.0))
                 .width(iced::Fill),
         )
         .padding(Padding {
@@ -327,7 +385,7 @@ impl App {
         });
 
         let animated_content: Element<'_, Message> =
-            Animation::new(&self.navigation.slide_offset, main_content)
+            Animation::new(self.navigation.slide_offset(), main_content)
                 .on_update(|event| Message::Navigation(navigation::Message::SlideOffset(event)))
                 .into();
 
@@ -339,7 +397,7 @@ impl App {
 
         if screen == Slide::Subscriptions {
             let chaos_overlay = canvas(chaos::ChaosOverlay {
-                circles: &self.chaos.circles,
+                circles: self.chaos.circles(),
             })
             .width(iced::Fill)
             .height(iced::Fill);
@@ -356,8 +414,8 @@ impl App {
         }
     }
 
-    fn view_navigation(&self) -> Element<'_, Message> {
-        let screen = self.navigation.screen;
+    fn view_navigation(&self, ctx: ScaleCtx) -> Element<'_, Message> {
+        let screen = self.navigation.screen();
 
         let prev_label = row![icon_chevron_left(), text("Previous")]
             .spacing(4)
@@ -382,7 +440,7 @@ impl App {
         let current = screen as usize;
         let total = Slide::COUNT;
         let slide_indicator = text(format!("{} / {}", current + 1, total))
-            .size(self.sz(20))
+            .size(ctx.sz(20))
             .color(SUBTITLE_COLOR);
 
         let mut nav_row = row![prev_btn, slide_indicator, next_btn]
@@ -392,42 +450,16 @@ impl App {
         if self.ctrl_held {
             let theme_picker = row![
                 text("Theme: "),
-                pick_list(Theme::ALL, Some(&self.theming.theme), |t| Message::Theming(
-                    theming::Message::ThemeChanged(t)
-                ),),
+                pick_list(
+                    Theme::ALL,
+                    Some(self.theming.theme()),
+                    |t| Message::Theming(theming::Message::ThemeChanged(t)),
+                ),
             ]
             .spacing(10);
             nav_row = nav_row.push(theme_picker);
         }
 
         nav_row.into()
-    }
-
-    /// Scale factor based on window size relative to 1024x768 base.
-    pub fn scale(&self) -> f32 {
-        self.chaos.scale()
-    }
-
-    /// Scale a pixel size (for text sizes, icon sizes, etc).
-    pub fn sz(&self, base: u32) -> u32 {
-        ((base as f32) * self.scale()) as u32
-    }
-
-    /// Scale a float value (for spacing, padding, heights).
-    pub fn sp(&self, base: f32) -> f32 {
-        base * self.scale()
-    }
-
-    pub fn md_settings(&self) -> markdown::Settings {
-        let mut settings =
-            markdown::Settings::with_text_size(self.sz(TEXT_SIZE), self.theming.theme.clone());
-        settings.code_size = self.sz(CODE_SIZE).into();
-        settings
-    }
-
-    pub fn md_container<'a>(&self, md: &'a [markdown::Item]) -> Element<'a, Message> {
-        let md_view: Element<'a, Message, AppTheme, _> =
-            markdown::view(md, self.md_settings()).map(|_| Message::Noop);
-        themer(Some(AppTheme(self.theming.theme.clone())), md_view).into()
     }
 }

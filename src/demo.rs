@@ -1,10 +1,10 @@
 pub struct Demo {
-    pub button_clicks: u32,
-    pub input_changes: u32,
-    pub input_submits: u32,
-    pub demo_input: String,
-    pub demo_spacing: f32,
-    pub demo_padding: f32,
+    button_clicks: u32,
+    input_changes: u32,
+    input_submits: u32,
+    input_text: String,
+    spacing: f32,
+    padding: f32,
 }
 
 #[derive(Debug, Clone)]
@@ -26,9 +26,9 @@ impl Default for Demo {
             button_clicks: 0,
             input_changes: 0,
             input_submits: 0,
-            demo_input: String::new(),
-            demo_spacing: 10.0,
-            demo_padding: 10.0,
+            input_text: String::new(),
+            spacing: 10.0,
+            padding: 10.0,
         }
     }
 }
@@ -41,19 +41,43 @@ impl Demo {
                 self.button_clicks += 1;
             }
             Message::InputChanged(value) => {
-                self.demo_input = value;
+                self.input_text = value;
                 self.input_changes += 1;
             }
             Message::InputSubmitted => {
                 self.input_submits += 1;
             }
             Message::SpacingChanged(val) => {
-                self.demo_spacing = val;
+                self.spacing = val;
             }
             Message::PaddingChanged(val) => {
-                self.demo_padding = val;
+                self.padding = val;
             }
         }
         Action::None
+    }
+
+    pub fn button_clicks(&self) -> u32 {
+        self.button_clicks
+    }
+
+    pub fn input_changes(&self) -> u32 {
+        self.input_changes
+    }
+
+    pub fn input_submits(&self) -> u32 {
+        self.input_submits
+    }
+
+    pub fn input_text(&self) -> &str {
+        &self.input_text
+    }
+
+    pub fn spacing(&self) -> f32 {
+        self.spacing
+    }
+
+    pub fn padding(&self) -> f32 {
+        self.padding
     }
 }

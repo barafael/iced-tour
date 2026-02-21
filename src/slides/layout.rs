@@ -1,11 +1,11 @@
 use iced::{
-    Color, Element,
-    widget::{column, container, row, scrollable, slider, space, text},
+    Color, Element, Theme,
+    widget::{column, container, markdown, row, scrollable, slider, space, text},
 };
 
-use crate::{App, FIRA_MONO, Message, SUBTITLE_COLOR, TEXT_SIZE, demo};
+use crate::{FIRA_MONO, Message, SUBTITLE_COLOR, ScaleCtx, TEXT_SIZE, demo, render_markdown};
 
-pub const MD_ROW_COL: &str = r#"
+const MD_ROW_COL: &str = r#"
 ```rust
 // Nested layouts
 column![
@@ -19,7 +19,7 @@ column![
 const PASTEL_ORANGE: Color = Color::from_rgb(1.0, 0.75, 0.5);
 const PASTEL_BLUE: Color = Color::from_rgb(0.55, 0.75, 1.0);
 
-pub const MD_CONTAINER: &str = r#"
+const MD_CONTAINER: &str = r#"
 ```rust
 // Wrap content for positioning and styling
 container(content)
@@ -30,7 +30,7 @@ container(content)
 ```
 "#;
 
-pub const MD_SPACING: &str = r#"
+const MD_SPACING: &str = r#"
 ```rust
 column![a, b, c]
     .spacing(10)           // Gap between children
@@ -39,18 +39,34 @@ column![a, b, c]
 ```
 "#;
 
-impl App {
-    pub fn view_layout_row_col_screen(&self) -> Element<'_, Message> {
+pub struct LayoutSlide {
+    md_row_col: Vec<markdown::Item>,
+    md_container: Vec<markdown::Item>,
+    md_spacing: Vec<markdown::Item>,
+}
+
+impl Default for LayoutSlide {
+    fn default() -> Self {
+        Self {
+            md_row_col: markdown::parse(MD_ROW_COL).collect(),
+            md_container: markdown::parse(MD_CONTAINER).collect(),
+            md_spacing: markdown::parse(MD_SPACING).collect(),
+        }
+    }
+}
+
+impl LayoutSlide {
+    pub fn view_row_col(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The building blocks of layout.").size(self.sz(TEXT_SIZE)),
-                space().height(self.sp(12.0)),
-                self.md_container(&self.md_row_col),
-                space().height(self.sp(20.0)),
-                space().height(self.sp(10.0)),
+                text("The building blocks of layout.").size(ctx.sz(TEXT_SIZE)),
+                space().height(ctx.sp(12.0)),
+                render_markdown(&self.md_row_col, ctx, theme),
+                space().height(ctx.sp(20.0)),
+                space().height(ctx.sp(10.0)),
                 {
                     let cell = |color: Color| {
-                        let s = self.sp(50.0);
+                        let s = ctx.sp(50.0);
                         container(space())
                             .width(s)
                             .height(s)
@@ -70,41 +86,46 @@ impl App {
                     .clip(true)
                 },
             ]
-            .spacing(self.sp(8.0)),
+            .spacing(ctx.sp(8.0)),
         )
         .into()
     }
 
-    pub fn view_layout_container_screen(&self) -> Element<'_, Message> {
+    pub fn view_container(&self, ctx: ScaleCtx, theme: &Theme) -> Element<'_, Message> {
         scrollable(
             column![
                 text("Container wraps content for positioning and styling.")
-                    .size(self.sz(TEXT_SIZE)),
-                space().height(self.sp(12.0)),
-                self.md_container(&self.md_container),
-                space().height(self.sp(20.0)),
+                    .size(ctx.sz(TEXT_SIZE)),
+                space().height(ctx.sp(12.0)),
+                render_markdown(&self.md_container, ctx, theme),
+                space().height(ctx.sp(20.0)),
                 text("Live example:")
-                    .size(self.sz(TEXT_SIZE))
+                    .size(ctx.sz(TEXT_SIZE))
                     .color(SUBTITLE_COLOR),
-                space().height(self.sp(10.0)),
+                space().height(ctx.sp(10.0)),
                 container(
                     container(text("Centered and styled"))
-                        .padding(self.sp(20.0))
+                        .padding(ctx.sp(20.0))
                         .style(container::rounded_box),
                 )
                 .width(iced::Fill)
                 .center_x(iced::Fill),
             ]
-            .spacing(self.sp(8.0)),
+            .spacing(ctx.sp(8.0)),
         )
         .into()
     }
 
-    pub fn view_layout_spacing_screen(&self) -> Element<'_, Message> {
-        let sp = self.demo.demo_spacing;
-        let pd = self.demo.demo_padding;
+    pub fn view_spacing(
+        &self,
+        ctx: ScaleCtx,
+        theme: &Theme,
+        demo: &demo::Demo,
+        shift_held: bool,
+    ) -> Element<'_, Message> {
+        let sp = demo.spacing();
+        let pd = demo.padding();
 
-        // Interactive preview driven by sliders
         let preview: Element<'_, Message> = container(
             column![text("A"), text("B"), text("C")]
                 .spacing(sp)
@@ -114,7 +135,7 @@ impl App {
         .style(container::rounded_box)
         .into();
 
-        let preview = if self.shift_held {
+        let preview = if shift_held {
             preview.explain(Color::from_rgb(0.4, 0.2, 0.8))
         } else {
             preview
@@ -122,44 +143,44 @@ impl App {
 
         let spacing_slider = row![
             text(format!(".spacing({:.0})", sp))
-                .size(self.sz(22))
+                .size(ctx.sz(22))
                 .font(FIRA_MONO),
             slider(0.0..=40.0, sp, |v| Message::Demo(
                 demo::Message::SpacingChanged(v)
             ))
-            .width(self.sp(200.0)),
+            .width(ctx.sp(200.0)),
         ]
-        .spacing(self.sp(12.0))
+        .spacing(ctx.sp(12.0))
         .align_y(iced::Alignment::Center);
 
         let padding_slider = row![
             text(format!(".padding({:.0})", pd))
-                .size(self.sz(22))
+                .size(ctx.sz(22))
                 .font(FIRA_MONO),
             slider(0.0..=40.0, pd, |v| Message::Demo(
                 demo::Message::PaddingChanged(v)
             ))
-            .width(self.sp(200.0)),
+            .width(ctx.sp(200.0)),
         ]
-        .spacing(self.sp(12.0))
+        .spacing(ctx.sp(12.0))
         .align_y(iced::Alignment::Center);
 
         scrollable(
             column![
                 text("Control gaps and alignment with spacing, padding, and align.")
-                    .size(self.sz(TEXT_SIZE)),
-                space().height(self.sp(12.0)),
-                self.md_container(&self.md_spacing),
-                space().height(self.sp(20.0)),
-                row![spacing_slider, padding_slider].spacing(self.sp(20.0)),
-                space().height(self.sp(12.0)),
+                    .size(ctx.sz(TEXT_SIZE)),
+                space().height(ctx.sp(12.0)),
+                render_markdown(&self.md_spacing, ctx, theme),
+                space().height(ctx.sp(20.0)),
+                row![spacing_slider, padding_slider].spacing(ctx.sp(20.0)),
+                space().height(ctx.sp(12.0)),
                 preview,
-                space().height(self.sp(8.0)),
+                space().height(ctx.sp(8.0)),
                 text("hint: press shift")
-                    .size(self.sz(TEXT_SIZE - 4))
+                    .size(ctx.sz(TEXT_SIZE - 4))
                     .color(SUBTITLE_COLOR),
             ]
-            .spacing(self.sp(8.0)),
+            .spacing(ctx.sp(8.0)),
         )
         .into()
     }

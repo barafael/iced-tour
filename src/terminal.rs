@@ -1,7 +1,7 @@
 use iced::Font;
 
 pub struct Terminal {
-    pub term: iced_term::Terminal,
+    term: iced_term::Terminal,
 }
 
 #[derive(Debug, Clone)]
@@ -32,6 +32,10 @@ impl Terminal {
 
     pub fn subscription(&self) -> iced::Subscription<Message> {
         self.term.subscription().map(Message::TermEvent)
+    }
+
+    pub fn term(&self) -> &iced_term::Terminal {
+        &self.term
     }
 }
 

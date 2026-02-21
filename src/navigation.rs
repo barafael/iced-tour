@@ -1,12 +1,10 @@
-use iced_anim::{Animated, Motion};
-use strum::EnumCount;
-
 use crate::slides::Slide;
 use crate::sliding;
+use iced_anim::{Animated, Motion};
 
 pub struct Navigation {
-    pub screen: Slide,
-    pub slide_offset: Animated<sliding::SlideOffset>,
+    screen: Slide,
+    slide_offset: Animated<sliding::SlideOffset>,
 }
 
 #[derive(Debug, Clone)]
@@ -65,11 +63,15 @@ impl Navigation {
         }
     }
 
-    pub fn is_animating(&self) -> bool {
-        self.slide_offset.value() != &sliding::SlideOffset::settled()
+    pub fn screen(&self) -> Slide {
+        self.screen
     }
 
-    pub fn slide_count() -> usize {
-        Slide::COUNT
+    pub fn slide_offset(&self) -> &Animated<sliding::SlideOffset> {
+        &self.slide_offset
+    }
+
+    pub fn is_animating(&self) -> bool {
+        self.slide_offset.value() != &sliding::SlideOffset::settled()
     }
 }
