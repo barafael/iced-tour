@@ -58,7 +58,7 @@ pub enum Screen {
     Subscriptions,
 
     // Demo
-    #[strum(serialize = "15. Page Poker")]
+    #[strum(serialize = "15. Page Boop")]
     Interactive,
 
     // Community

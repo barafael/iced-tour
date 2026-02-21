@@ -4,12 +4,12 @@ use page_boop::{FIRA_MONO_BYTES, PageBoop};
 const FIRA_MONO: Font = Font::with_name("Fira Mono");
 
 struct App {
-    poker: PageBoop,
+    boop: PageBoop,
 }
 
 #[derive(Debug, Clone)]
 enum Message {
-    Poker(page_boop::Message),
+    Boop(page_boop::Message),
 }
 
 fn main() -> iced::Result {
@@ -23,7 +23,7 @@ fn main() -> iced::Result {
 impl Default for App {
     fn default() -> Self {
         Self {
-            poker: PageBoop::new(),
+            boop: PageBoop::new(),
         }
     }
 }
@@ -31,12 +31,12 @@ impl Default for App {
 impl App {
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::Poker(msg) => self.poker.update(msg).map(Message::Poker),
+            Message::Boop(msg) => self.boop.update(msg).map(Message::Boop),
         }
     }
 
     fn view(&self) -> Element<'_, Message> {
-        iced::widget::container(self.poker.view().map(Message::Poker))
+        iced::widget::container(self.boop.view().map(Message::Boop))
             .padding(30)
             .width(iced::Fill)
             .height(iced::Fill)
