@@ -4,7 +4,7 @@ use iced::{
 };
 use iced_anim::widget::button;
 
-use crate::{App, Message, SUBTITLE_COLOR, TEXT_SIZE};
+use crate::{App, Message, SUBTITLE_COLOR, TEXT_SIZE, chaos};
 
 pub const MD_SUBSCRIPTIONS: &str = r#"
 ```rust
@@ -36,7 +36,7 @@ impl App {
                 text("Other common uses: timers, window events, WebSocket messages.")
                     .size(self.sz(TEXT_SIZE)),
                 space().height(self.sp(12.0)),
-                button("🚨 Panic!").on_press(Message::PanicChaos),
+                button("🚨 Panic!").on_press(Message::Chaos(chaos::Message::PanicChaos)),
             ]
             .spacing(self.sp(8.0)),
         )

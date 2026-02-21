@@ -6,7 +6,9 @@ use iced::{
 use iced_anim::widget::button;
 use lucide_icons::iced::{icon_circle_check, icon_circle_x};
 
-use crate::{App, CORRECT_COLOR, FIRA_MONO, INCORRECT_COLOR, Message, ORANGE, SUBTITLE_COLOR};
+use crate::{
+    App, CORRECT_COLOR, FIRA_MONO, INCORRECT_COLOR, Message, ORANGE, SUBTITLE_COLOR, quiz,
+};
 
 // WWM dark navy colors
 const WWM_BG: Color = Color::from_rgb(0.08, 0.12, 0.22);
@@ -193,12 +195,12 @@ impl App {
         self.view_quiz(
             "Where should validation of a text input happen?",
             &[
-                ("In the View", Message::QuizAnswer(0)),
-                ("In the Message", Message::QuizAnswer(1)),
-                ("In the Update", Message::QuizAnswer(2)),
-                ("In the Model", Message::QuizAnswer(3)),
+                ("In the View", Message::Quiz(quiz::Message::Answer(0))),
+                ("In the Message", Message::Quiz(quiz::Message::Answer(1))),
+                ("In the Update", Message::Quiz(quiz::Message::Answer(2))),
+                ("In the Model", Message::Quiz(quiz::Message::Answer(3))),
             ],
-            self.quiz_answer,
+            self.quiz.answer,
             &[
                 (2, "Correct! The Update function processes input and validates data before updating the Model.", true),
                 (0, "Not quite. The View only renders UI from state — it shouldn't contain logic.", false),
@@ -212,12 +214,12 @@ impl App {
         self.view_quiz(
             "Where should you make an HTTP request?",
             &[
-                ("In the View", Message::QuizHttpAnswer(0)),
-                ("In the Message", Message::QuizHttpAnswer(1)),
-                ("In a Task from Update", Message::QuizHttpAnswer(2)),
-                ("In the Model", Message::QuizHttpAnswer(3)),
+                ("In the View", Message::Quiz(quiz::Message::HttpAnswer(0))),
+                ("In the Message", Message::Quiz(quiz::Message::HttpAnswer(1))),
+                ("In a Task from Update", Message::Quiz(quiz::Message::HttpAnswer(2))),
+                ("In the Model", Message::Quiz(quiz::Message::HttpAnswer(3))),
             ],
-            self.quiz_http_answer,
+            self.quiz.http_answer,
             &[
                 (2, "Correct! HTTP requests are async operations, so they belong in a Task returned from Update.", true),
                 (0, "Not quite. The View only renders UI — it can't perform side effects.", false),
@@ -231,12 +233,12 @@ impl App {
         self.view_quiz(
             "How do you disable a button when a field is empty?",
             &[
-                ("Conditional on_press in View", Message::QuizButtonAnswer(0)),
-                ("Flag in Model, View reads it", Message::QuizButtonAnswer(1)),
-                ("Send a DisableButton message", Message::QuizButtonAnswer(2)),
-                ("Add a disabled bool to Model", Message::QuizButtonAnswer(3)),
+                ("Conditional on_press in View", Message::Quiz(quiz::Message::ButtonAnswer(0))),
+                ("Flag in Model, View reads it", Message::Quiz(quiz::Message::ButtonAnswer(1))),
+                ("Send a DisableButton message", Message::Quiz(quiz::Message::ButtonAnswer(2))),
+                ("Add a disabled bool to Model", Message::Quiz(quiz::Message::ButtonAnswer(3))),
             ],
-            self.quiz_button_answer,
+            self.quiz.button_answer,
             &[
                 (0, "Correct! The View can check the condition directly and conditionally call on_press.", true),
                 (1, "Also correct! For complex logic, Update can set a flag that the View reads.", true),
@@ -250,12 +252,12 @@ impl App {
         self.view_quiz(
             "How does input validation with error display work?",
             &[
-                ("Update → Model → View", Message::QuizValidationAnswer(0)),
-                ("View validates directly", Message::QuizValidationAnswer(1)),
-                ("Update shows error directly", Message::QuizValidationAnswer(2)),
-                ("Message sends ValidateInput", Message::QuizValidationAnswer(3)),
+                ("Update → Model → View", Message::Quiz(quiz::Message::ValidationAnswer(0))),
+                ("View validates directly", Message::Quiz(quiz::Message::ValidationAnswer(1))),
+                ("Update shows error directly", Message::Quiz(quiz::Message::ValidationAnswer(2))),
+                ("Message sends ValidateInput", Message::Quiz(quiz::Message::ValidationAnswer(3))),
             ],
-            self.quiz_validation_answer,
+            self.quiz.validation_answer,
             &[
                 (0, "Correct! Update validates, stores errors in Model, View displays them.", true),
                 (1, "Not quite. The View shouldn't contain validation logic — it only renders.", false),

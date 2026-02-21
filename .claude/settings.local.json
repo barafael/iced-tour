@@ -34,7 +34,8 @@
       "Bash(powershell.exe:*)",
       "Bash(/usr/bin/env bash -c \"echo hello\")",
       "WebFetch(domain:api.github.com)",
-      "Bash(Out-String)"
+      "Bash(Out-String)",
+      "WebFetch(domain:jl710.github.io)"
     ]
   }
 }

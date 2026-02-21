@@ -2,7 +2,7 @@ use iced::{
     Color, Element, Event, Font, Padding, Subscription, Task, Theme, event, keyboard,
     widget::{canvas, column, container, markdown, pick_list, row, space, stack, text, themer},
 };
-use iced_anim::{Animated, Animation, Motion, widget::button};
+use iced_anim::{Animation, widget::button};
 use lucide_icons::{
     LUCIDE_FONT_BYTES,
     iced::{icon_chevron_left, icon_chevron_right},
@@ -14,9 +14,14 @@ use crate::slides::Slide;
 use theme::AppTheme;
 
 mod chaos;
+mod demo;
+mod navigation;
+mod quiz;
 mod slides;
 mod sliding;
+mod terminal;
 mod theme;
+mod theming;
 
 pub const BITTER: Font = Font::with_name("Bitter");
 pub const FIRA_MONO: Font = Font::with_name("Fira Mono");
@@ -34,28 +39,15 @@ pub const INCORRECT_COLOR: Color = Color::from_rgb(0.85, 0.25, 0.25);
 pub const ELM_CIRCLE_OF_LIFE: &[u8] = include_bytes!("../assets/elm.svg");
 
 pub struct App {
-    pub screen: Slide,
-    slide_offset: Animated<sliding::SlideOffset>,
+    pub navigation: navigation::Navigation,
+    pub demo: demo::Demo,
+    pub theming: theming::Theming,
+    pub chaos: chaos::Chaos,
+    pub quiz: quiz::Quiz,
     pub page_boop: page_boop::PageBoop,
-    pub theme: Theme,
+    pub terminal: terminal::Terminal,
     pub ctrl_held: bool,
     pub shift_held: bool,
-    pub chaos_circles: Vec<chaos::ChaosCircle>,
-    pub chaos_paused: bool,
-    canvas_size: (f32, f32),
-    pub button_clicks: u32,
-    pub input_changes: u32,
-    pub input_submits: u32,
-    pub demo_input: String,
-    pub demo_spacing: f32,
-    pub demo_padding: f32,
-    pub hover_color: Color,
-    pub show_color_picker: bool,
-    pub quiz_answer: Option<u8>,
-    pub quiz_http_answer: Option<u8>,
-    pub quiz_button_answer: Option<u8>,
-    pub quiz_validation_answer: Option<u8>,
-    pub term: iced_term::Terminal,
 
     // Cached markdown content for each screen
     pub md_intro: Vec<markdown::Item>,
@@ -76,119 +68,54 @@ pub struct App {
 
 impl Default for App {
     fn default() -> Self {
-        use slides::*;
-
         Self {
-            screen: Slide::default(),
-            slide_offset: Animated::new(sliding::SlideOffset::settled(), Motion::SNAPPY),
+            navigation: navigation::Navigation::default(),
+            demo: demo::Demo::default(),
+            theming: theming::Theming::default(),
+            chaos: chaos::Chaos::default(),
+            quiz: crate::quiz::Quiz::default(),
             page_boop: page_boop::PageBoop::with_style(page_boop::StyleConfig {
                 mono_font: FIRA_MONO,
                 subtitle_color: SUBTITLE_COLOR,
                 text_size: TEXT_SIZE,
             }),
-            theme: Theme::GruvboxLight,
+            terminal: terminal::Terminal::new(FIRA_MONO),
             ctrl_held: false,
             shift_held: false,
-            chaos_circles: Vec::new(),
-            chaos_paused: false,
-            canvas_size: (800.0, 600.0),
-            button_clicks: 0,
-            input_changes: 0,
-            input_submits: 0,
-            demo_input: String::new(),
-            demo_spacing: 10.0,
-            demo_padding: 10.0,
-            hover_color: Color::from_rgb(0.3, 0.7, 1.0),
-            show_color_picker: false,
-            quiz_answer: None,
-            quiz_http_answer: None,
-            quiz_button_answer: None,
-            quiz_validation_answer: None,
-            term: shell_backend(),
-            md_intro: markdown::parse(intro::MD_INTRO).collect(),
-            md_model: markdown::parse(model::MD_MODEL).collect(),
-            md_view: markdown::parse(view::MD_VIEW).collect(),
-            md_row_col: markdown::parse(layout::MD_ROW_COL).collect(),
-            md_container: markdown::parse(layout::MD_CONTAINER).collect(),
-            md_spacing: markdown::parse(layout::MD_SPACING).collect(),
-            md_button: markdown::parse(button::MD_BUTTON).collect(),
-            md_text_input: markdown::parse(text_input::MD_TEXT_INPUT).collect(),
-            md_message: markdown::parse(message::MD_MESSAGE).collect(),
-            md_update: markdown::parse(update::MD_UPDATE).collect(),
-            md_tasks: markdown::parse(tasks::MD_TASKS).collect(),
-            md_subscriptions: markdown::parse(subscriptions::MD_SUBSCRIPTIONS).collect(),
-            md_constructors: markdown::parse(constructors::MD_CONSTRUCTORS).collect(),
-            md_widget_messages: markdown::parse(constructors::MD_WIDGET_MESSAGES).collect(),
+            md_intro: markdown::parse(slides::intro::MD_INTRO).collect(),
+            md_model: markdown::parse(slides::model::MD_MODEL).collect(),
+            md_view: markdown::parse(slides::view::MD_VIEW).collect(),
+            md_row_col: markdown::parse(slides::layout::MD_ROW_COL).collect(),
+            md_container: markdown::parse(slides::layout::MD_CONTAINER).collect(),
+            md_spacing: markdown::parse(slides::layout::MD_SPACING).collect(),
+            md_button: markdown::parse(slides::button::MD_BUTTON).collect(),
+            md_text_input: markdown::parse(slides::text_input::MD_TEXT_INPUT).collect(),
+            md_message: markdown::parse(slides::message::MD_MESSAGE).collect(),
+            md_update: markdown::parse(slides::update::MD_UPDATE).collect(),
+            md_tasks: markdown::parse(slides::tasks::MD_TASKS).collect(),
+            md_subscriptions: markdown::parse(slides::subscriptions::MD_SUBSCRIPTIONS).collect(),
+            md_constructors: markdown::parse(slides::constructors::MD_CONSTRUCTORS).collect(),
+            md_widget_messages: markdown::parse(slides::constructors::MD_WIDGET_MESSAGES).collect(),
         }
     }
 }
 
-fn shell_backend() -> iced_term::Terminal {
-    #[cfg(not(windows))]
-    let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".into());
-    #[cfg(windows)]
-    let shell = "cmd.exe".to_string();
-    let settings = iced_term::settings::Settings {
-        font: iced_term::settings::FontSettings {
-            size: 14.0,
-            font_type: FIRA_MONO,
-            ..Default::default()
-        },
-        backend: iced_term::settings::BackendSettings {
-            program: shell,
-            ..Default::default()
-        },
-        ..Default::default()
-    };
-    iced_term::Terminal::new(0, settings).expect("failed to create terminal")
-}
-
 #[derive(Debug, Clone)]
 pub enum Message {
-    // Navigation
-    NextScreen,
-    PrevScreen,
-
-    // Page Boop (interactive screen)
+    Navigation(navigation::Message),
+    Demo(demo::Message),
+    Theming(theming::Message),
+    Chaos(chaos::Message),
+    Quiz(quiz::Message),
     PageBoop(page_boop::Message),
+    Terminal(terminal::Message),
 
-    // No-op (used for markdown link clicks)
-    Noop,
-
-    // Demo
-    ButtonClicked,
-    DemoInputChanged(String),
-    DemoInputSubmitted,
-    DemoSpacingChanged(f32),
-    DemoPaddingChanged(f32),
-    OpenColorPicker,
-    SubmitHoverColor(Color),
-    CancelColorPicker,
-
-    // Animation
-    SlideOffset(iced_anim::Event<sliding::SlideOffset>),
-
-    // Theme
-    ThemeChanged(Theme),
     CtrlPressed,
     CtrlReleased,
     ShiftPressed,
     ShiftReleased,
 
-    // Chaos
-    SpawnChaos,
-    PanicChaos,
-    Tick,
-    WindowResized(f32, f32),
-
-    // Quiz
-    QuizAnswer(u8),
-    QuizHttpAnswer(u8),
-    QuizButtonAnswer(u8),
-    QuizValidationAnswer(u8),
-
-    // Terminal
-    TermEvent(iced_term::Event),
+    Noop,
 }
 
 fn main() -> iced::Result {
@@ -207,7 +134,7 @@ fn main() -> iced::Result {
 
 impl App {
     fn theme(&self) -> Theme {
-        self.theme.clone()
+        self.theming.theme.clone()
     }
 
     fn subscription(&self) -> Subscription<Message> {
@@ -234,31 +161,31 @@ impl App {
             Event::Keyboard(keyboard::Event::KeyPressed {
                 key: Key::Named(Named::ArrowLeft),
                 ..
-            }) => Some(Message::PrevScreen),
+            }) => Some(Message::Navigation(navigation::Message::PrevScreen)),
             Event::Keyboard(keyboard::Event::KeyPressed {
                 key: Key::Named(Named::ArrowRight),
                 ..
-            }) => Some(Message::NextScreen),
-            Event::Window(iced::window::Event::Resized(size)) => {
-                Some(Message::WindowResized(size.width, size.height))
-            }
+            }) => Some(Message::Navigation(navigation::Message::NextScreen)),
+            Event::Window(iced::window::Event::Resized(size)) => Some(Message::Chaos(
+                chaos::Message::WindowResized(size.width, size.height),
+            )),
             _ => None,
         });
 
-        let needs_tick = self.screen == Slide::Subscriptions
-            || self.slide_offset.value() != &sliding::SlideOffset::settled();
+        let screen = self.navigation.screen;
+        let needs_tick = screen == Slide::Subscriptions || self.navigation.is_animating();
 
-        let term_sub = self.term.subscription().map(Message::TermEvent);
+        let term_sub = self.terminal.subscription().map(Message::Terminal);
 
-        if self.screen == Slide::Subscriptions {
-            let tick =
-                iced::time::every(std::time::Duration::from_millis(16)).map(|_| Message::Tick);
-            let spawn_timer =
-                iced::time::every(std::time::Duration::from_secs(3)).map(|_| Message::SpawnChaos);
+        if screen == Slide::Subscriptions {
+            let tick = iced::time::every(std::time::Duration::from_millis(16))
+                .map(|_| Message::Chaos(chaos::Message::Tick));
+            let spawn_timer = iced::time::every(std::time::Duration::from_secs(3))
+                .map(|_| Message::Chaos(chaos::Message::SpawnChaos));
             Subscription::batch([events, tick, spawn_timer, term_sub])
         } else if needs_tick {
-            let tick =
-                iced::time::every(std::time::Duration::from_millis(16)).map(|_| Message::Tick);
+            let tick = iced::time::every(std::time::Duration::from_millis(16))
+                .map(|_| Message::Chaos(chaos::Message::Tick));
             Subscription::batch([events, tick, term_sub])
         } else {
             Subscription::batch([events, term_sub])
@@ -269,76 +196,57 @@ impl App {
         match message {
             Message::Noop => Task::none(),
 
-            // Navigation
-            Message::NextScreen => {
-                if !self.screen.is_last() {
-                    self.chaos_circles.clear();
-                    self.chaos_paused = false;
-                    self.screen.forward();
-                    self.slide_offset =
-                        Animated::new(sliding::SlideOffset::entering_forward(), Motion::SNAPPY);
-                    self.slide_offset
-                        .set_target(sliding::SlideOffset::settled());
+            Message::Navigation(msg) => {
+                match self.navigation.update(msg) {
+                    navigation::Action::None => {}
+                    navigation::Action::SlideChanged => {
+                        self.chaos.clear_and_unpause();
+                    }
                 }
-                Task::none()
-            }
-            Message::PrevScreen => {
-                if !self.screen.is_first() {
-                    self.chaos_circles.clear();
-                    self.chaos_paused = false;
-                    self.screen.backward();
-                    self.slide_offset =
-                        Animated::new(sliding::SlideOffset::entering_backward(), Motion::SNAPPY);
-                    self.slide_offset
-                        .set_target(sliding::SlideOffset::settled());
-                }
-                Task::none()
-            }
-            Message::SlideOffset(event) => {
-                self.slide_offset.update(event);
                 Task::none()
             }
 
-            // Page Boop
-            Message::PageBoop(msg) => self.page_boop.update(msg).map(Message::PageBoop),
-            Message::ButtonClicked => {
-                self.button_clicks += 1;
+            Message::Demo(msg) => {
+                match self.demo.update(msg) {
+                    demo::Action::None => {}
+                }
                 Task::none()
             }
-            Message::DemoInputChanged(value) => {
-                self.demo_input = value;
-                self.input_changes += 1;
+
+            Message::Theming(msg) => {
+                match self.theming.update(msg) {
+                    theming::Action::None => {}
+                    theming::Action::ThemeChanged(_) => {}
+                }
                 Task::none()
             }
-            Message::DemoInputSubmitted => {
-                self.input_submits += 1;
+
+            Message::Chaos(msg) => {
+                match self.chaos.update(msg) {
+                    chaos::Action::None => {}
+                }
                 Task::none()
             }
-            Message::DemoSpacingChanged(val) => {
-                self.demo_spacing = val;
+
+            Message::Quiz(msg) => {
+                match self.quiz.update(msg) {
+                    quiz::Action::None => {}
+                }
                 Task::none()
             }
-            Message::DemoPaddingChanged(val) => {
-                self.demo_padding = val;
+
+            Message::PageBoop(msg) => match self.page_boop.update(msg) {
+                page_boop::Action::None => Task::none(),
+                page_boop::Action::Run(task) => task.map(Message::PageBoop),
+            },
+
+            Message::Terminal(msg) => {
+                match self.terminal.update(msg) {
+                    terminal::Action::None => {}
+                }
                 Task::none()
             }
-            Message::OpenColorPicker => {
-                self.show_color_picker = true;
-                Task::none()
-            }
-            Message::SubmitHoverColor(color) => {
-                self.hover_color = color;
-                self.show_color_picker = false;
-                Task::none()
-            }
-            Message::CancelColorPicker => {
-                self.show_color_picker = false;
-                Task::none()
-            }
-            Message::ThemeChanged(theme) => {
-                self.theme = theme;
-                Task::none()
-            }
+
             Message::CtrlPressed => {
                 self.ctrl_held = true;
                 Task::none()
@@ -355,59 +263,18 @@ impl App {
                 self.shift_held = false;
                 Task::none()
             }
-            Message::SpawnChaos => {
-                if !self.chaos_paused {
-                    let (w, h) = self.canvas_size;
-                    self.chaos_circles.push(chaos::ChaosCircle::random(w, h));
-                }
-                Task::none()
-            }
-            Message::PanicChaos => {
-                self.chaos_circles.clear();
-                self.chaos_paused = true;
-                Task::none()
-            }
-            Message::Tick => {
-                let (w, h) = self.canvas_size;
-                for circle in &mut self.chaos_circles {
-                    circle.update(w, h);
-                }
-                Task::none()
-            }
-            Message::WindowResized(width, height) => {
-                self.canvas_size = (width, height);
-                Task::none()
-            }
-            Message::QuizAnswer(answer) => {
-                self.quiz_answer = Some(answer);
-                Task::none()
-            }
-            Message::QuizHttpAnswer(answer) => {
-                self.quiz_http_answer = Some(answer);
-                Task::none()
-            }
-            Message::QuizButtonAnswer(answer) => {
-                self.quiz_button_answer = Some(answer);
-                Task::none()
-            }
-            Message::QuizValidationAnswer(answer) => {
-                self.quiz_validation_answer = Some(answer);
-                Task::none()
-            }
-            Message::TermEvent(iced_term::Event::BackendCall(_, cmd)) => {
-                self.term.handle(iced_term::Command::ProxyToBackend(cmd));
-                Task::none()
-            }
         }
     }
 
     fn view(&self) -> Element<'_, Message> {
-        let title = text(self.screen.to_string())
+        let screen = self.navigation.screen;
+
+        let title = text(screen.to_string())
             .size(self.sz(38))
             .font(FIRA_MONO)
             .color(ORANGE);
 
-        let content: Element<Message> = match self.screen {
+        let content: Element<Message> = match screen {
             Slide::Title => self.view_title_screen(),
             Slide::Intro => self.view_intro_screen(),
             Slide::Model => self.view_model_screen(),
@@ -446,7 +313,7 @@ impl App {
                     ..Default::default()
                 });
 
-        let offset = self.slide_offset.value();
+        let offset = self.navigation.slide_offset.value();
         let main_content = container(
             column![title, content]
                 .spacing(self.sp(20.0))
@@ -460,8 +327,8 @@ impl App {
         });
 
         let animated_content: Element<'_, Message> =
-            Animation::new(&self.slide_offset, main_content)
-                .on_update(Message::SlideOffset)
+            Animation::new(&self.navigation.slide_offset, main_content)
+                .on_update(|event| Message::Navigation(navigation::Message::SlideOffset(event)))
                 .into();
 
         let layout = column![
@@ -470,9 +337,9 @@ impl App {
             nav_bar
         ];
 
-        if self.screen == Slide::Subscriptions {
+        if screen == Slide::Subscriptions {
             let chaos_overlay = canvas(chaos::ChaosOverlay {
-                circles: &self.chaos_circles,
+                circles: &self.chaos.circles,
             })
             .width(iced::Fill)
             .height(iced::Fill);
@@ -490,6 +357,8 @@ impl App {
     }
 
     fn view_navigation(&self) -> Element<'_, Message> {
+        let screen = self.navigation.screen;
+
         let prev_label = row![icon_chevron_left(), text("Previous")]
             .spacing(4)
             .align_y(iced::Alignment::Center);
@@ -497,20 +366,20 @@ impl App {
             .spacing(4)
             .align_y(iced::Alignment::Center);
 
-        let prev_btn = if self.screen.is_first() {
+        let prev_btn = if screen.is_first() {
             button(prev_label)
         } else {
-            button(prev_label).on_press(Message::PrevScreen)
+            button(prev_label).on_press(Message::Navigation(navigation::Message::PrevScreen))
         };
 
-        let next_btn = if self.screen.is_last() {
+        let next_btn = if screen.is_last() {
             button(next_label)
         } else {
-            button(next_label).on_press(Message::NextScreen)
+            button(next_label).on_press(Message::Navigation(navigation::Message::NextScreen))
         };
 
         // Slide indicator
-        let current = self.screen as usize;
+        let current = screen as usize;
         let total = Slide::COUNT;
         let slide_indicator = text(format!("{} / {}", current + 1, total))
             .size(self.sz(20))
@@ -523,7 +392,9 @@ impl App {
         if self.ctrl_held {
             let theme_picker = row![
                 text("Theme: "),
-                pick_list(Theme::ALL, Some(&self.theme), Message::ThemeChanged),
+                pick_list(Theme::ALL, Some(&self.theming.theme), |t| Message::Theming(
+                    theming::Message::ThemeChanged(t)
+                ),),
             ]
             .spacing(10);
             nav_row = nav_row.push(theme_picker);
@@ -532,10 +403,9 @@ impl App {
         nav_row.into()
     }
 
-    /// Scale factor based on window size relative to 1024×768 base.
+    /// Scale factor based on window size relative to 1024x768 base.
     pub fn scale(&self) -> f32 {
-        let (w, h) = self.canvas_size;
-        (w / 1024.0).min(h / 768.0).max(0.5)
+        self.chaos.scale()
     }
 
     /// Scale a pixel size (for text sizes, icon sizes, etc).
@@ -550,7 +420,7 @@ impl App {
 
     pub fn md_settings(&self) -> markdown::Settings {
         let mut settings =
-            markdown::Settings::with_text_size(self.sz(TEXT_SIZE), self.theme.clone());
+            markdown::Settings::with_text_size(self.sz(TEXT_SIZE), self.theming.theme.clone());
         settings.code_size = self.sz(CODE_SIZE).into();
         settings
     }
@@ -558,6 +428,6 @@ impl App {
     pub fn md_container<'a>(&self, md: &'a [markdown::Item]) -> Element<'a, Message> {
         let md_view: Element<'a, Message, AppTheme, _> =
             markdown::view(md, self.md_settings()).map(|_| Message::Noop);
-        themer(Some(AppTheme(self.theme.clone())), md_view).into()
+        themer(Some(AppTheme(self.theming.theme.clone())), md_view).into()
     }
 }

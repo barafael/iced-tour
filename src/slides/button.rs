@@ -4,7 +4,7 @@ use iced::{
 };
 use iced_anim::widget::button;
 
-use crate::{App, Message, TEXT_SIZE};
+use crate::{App, Message, TEXT_SIZE, demo};
 
 pub const MD_BUTTON: &str = r#"
 ```rust
@@ -14,13 +14,17 @@ button("Get").on_press(Message::Action)
 
 impl App {
     pub fn view_button_screen(&self) -> Element<'_, Message> {
-        let click_text = if self.button_clicks == 0 {
+        let click_text = if self.demo.button_clicks == 0 {
             String::from("Click the button!")
         } else {
             format!(
                 "Clicked {} time{}",
-                self.button_clicks,
-                if self.button_clicks == 1 { "" } else { "s" }
+                self.demo.button_clicks,
+                if self.demo.button_clicks == 1 {
+                    ""
+                } else {
+                    "s"
+                }
             )
         };
 
@@ -31,7 +35,7 @@ impl App {
                 self.md_container(&self.md_button),
                 space().height(self.sp(20.0)),
                 row![
-                    button("Get").on_press(Message::ButtonClicked),
+                    button("Get").on_press(Message::Demo(demo::Message::ButtonClicked)),
                     text(click_text).size(self.sz(TEXT_SIZE)),
                 ]
                 .spacing(self.sp(15.0))

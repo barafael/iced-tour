@@ -31,7 +31,10 @@ impl Default for App {
 impl App {
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::Boop(msg) => self.boop.update(msg).map(Message::Boop),
+            Message::Boop(msg) => match self.boop.update(msg) {
+                page_boop::Action::None => Task::none(),
+                page_boop::Action::Run(task) => task.map(Message::Boop),
+            },
         }
     }
 

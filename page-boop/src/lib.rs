@@ -84,43 +84,44 @@ impl PageBoop {
         self.message_log.push(msg);
     }
 
-    /// Process a message and return a task.
-    pub fn update(&mut self, message: Message) -> Task<Message> {
+    /// Process a message and return an action.
+    #[must_use]
+    pub fn update(&mut self, message: Message) -> Action {
         match message {
             Message::UrlChanged(url) => {
                 self.log_message(format!("UrlChanged({:?})", url));
                 self.model.url = url;
-                Task::none()
+                Action::None
             }
             Message::SecureChanged(secure) => {
                 self.log_message(format!("SecureChanged({})", secure));
                 self.model.secure = secure;
-                Task::none()
+                Action::None
             }
             Message::ModeChanged(mode) => {
                 self.log_message(format!("ModeChanged({})", mode));
                 self.model.mode = mode;
-                Task::none()
+                Action::None
             }
             Message::Action => {
                 self.log_message("Action".to_string());
                 if self.model.url.is_empty() {
                     self.model.result = "Please enter a URL".to_string();
-                    Task::none()
+                    Action::None
                 } else {
                     self.model.loading = true;
                     self.model.result.clear();
                     let url = self.model.url.clone();
                     let secure = self.model.secure;
                     let mode = self.model.mode;
-                    Task::perform(fetch_url(url, secure, mode), Message::Result)
+                    Action::Run(Task::perform(fetch_url(url, secure, mode), Message::Result))
                 }
             }
             Message::Result(result) => {
                 self.log_message(format!("Result({:?})", result));
                 self.model.loading = false;
                 self.model.result = result;
-                Task::none()
+                Action::None
             }
         }
     }
@@ -232,6 +233,11 @@ pub enum Message {
     ModeChanged(Mode),
     Action,
     Result(String),
+}
+
+pub enum Action {
+    None,
+    Run(Task<Message>),
 }
 
 /// Fetch a URL and return a result string based on the chosen mode.

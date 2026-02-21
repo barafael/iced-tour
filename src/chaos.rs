@@ -22,7 +22,6 @@ impl ChaosCircle {
         let x = rng.random_range(radius..bounds_width - radius);
         let y = rng.random_range(radius..bounds_height - radius);
 
-        // Random velocity between -2 and 2 pixels per frame
         let vx = rng.random_range(-2.0..2.0);
         let vy = rng.random_range(-2.0..2.0);
 
@@ -43,11 +42,10 @@ impl ChaosCircle {
         }
     }
 
-    pub fn update(&mut self, bounds_width: f32, bounds_height: f32) {
+    fn update_physics(&mut self, bounds_width: f32, bounds_height: f32) {
         self.x += self.vx;
         self.y += self.vy;
 
-        // Bounce off edges
         if self.x - self.radius < 0.0 || self.x + self.radius > bounds_width {
             self.vx = -self.vx;
             self.x = self.x.clamp(self.radius, bounds_width - self.radius);
@@ -80,10 +78,8 @@ impl<Message> canvas::Program<Message> for ChaosOverlay<'_> {
             let center = iced::Point::new(circle.x, circle.y);
             let path = Path::circle(center, circle.radius);
 
-            // Fill with random color
             frame.fill(&path, circle.color);
 
-            // Black border
             frame.stroke(
                 &path,
                 Stroke::default().with_color(Color::BLACK).with_width(2.0),
@@ -91,5 +87,73 @@ impl<Message> canvas::Program<Message> for ChaosOverlay<'_> {
         }
 
         vec![frame.into_geometry()]
+    }
+}
+
+// --- Composition pattern ---
+
+pub struct Chaos {
+    pub circles: Vec<ChaosCircle>,
+    pub paused: bool,
+    pub canvas_size: (f32, f32),
+}
+
+#[derive(Debug, Clone)]
+pub enum Message {
+    SpawnChaos,
+    PanicChaos,
+    Tick,
+    WindowResized(f32, f32),
+}
+
+pub enum Action {
+    None,
+}
+
+impl Default for Chaos {
+    fn default() -> Self {
+        Self {
+            circles: Vec::new(),
+            paused: false,
+            canvas_size: (800.0, 600.0),
+        }
+    }
+}
+
+impl Chaos {
+    #[must_use]
+    pub fn update(&mut self, message: Message) -> Action {
+        match message {
+            Message::SpawnChaos => {
+                if !self.paused {
+                    let (w, h) = self.canvas_size;
+                    self.circles.push(ChaosCircle::random(w, h));
+                }
+            }
+            Message::PanicChaos => {
+                self.circles.clear();
+                self.paused = true;
+            }
+            Message::Tick => {
+                let (w, h) = self.canvas_size;
+                for circle in &mut self.circles {
+                    circle.update_physics(w, h);
+                }
+            }
+            Message::WindowResized(width, height) => {
+                self.canvas_size = (width, height);
+            }
+        }
+        Action::None
+    }
+
+    pub fn clear_and_unpause(&mut self) {
+        self.circles.clear();
+        self.paused = false;
+    }
+
+    pub fn scale(&self) -> f32 {
+        let (w, h) = self.canvas_size;
+        (w / 1024.0).min(h / 768.0).max(0.5)
     }
 }

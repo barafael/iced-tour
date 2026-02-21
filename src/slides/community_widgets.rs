@@ -1,24 +1,27 @@
 use iced::{Element, Length, widget::container};
 use iced_term::TerminalView;
 
-use crate::{App, Message};
+use crate::{App, Message, terminal};
 
 impl App {
     pub fn view_community_widgets_screen(&self) -> Element<'_, Message> {
-        container(TerminalView::show(&self.term).map(Message::TermEvent))
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .padding(self.sp(4.0))
-            .style(|_| container::Style {
-                background: Some(iced::Color::BLACK.into()),
-                border: iced::Border {
-                    radius: 4.0.into(),
-                    ..Default::default()
-                },
+        container(
+            TerminalView::show(&self.terminal.term)
+                .map(|e| Message::Terminal(terminal::Message::TermEvent(e))),
+        )
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .padding(self.sp(4.0))
+        .style(|_| container::Style {
+            background: Some(iced::Color::BLACK.into()),
+            border: iced::Border {
+                radius: 4.0.into(),
                 ..Default::default()
-            })
-            .padding(self.sp(10.0))
-            .height(Length::Fill)
-            .into()
+            },
+            ..Default::default()
+        })
+        .padding(self.sp(10.0))
+        .height(Length::Fill)
+        .into()
     }
 }

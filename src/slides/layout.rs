@@ -3,7 +3,7 @@ use iced::{
     widget::{column, container, row, scrollable, slider, space, text},
 };
 
-use crate::{App, FIRA_MONO, Message, SUBTITLE_COLOR, TEXT_SIZE};
+use crate::{App, FIRA_MONO, Message, SUBTITLE_COLOR, TEXT_SIZE, demo};
 
 pub const MD_ROW_COL: &str = r#"
 ```rust
@@ -101,8 +101,8 @@ impl App {
     }
 
     pub fn view_layout_spacing_screen(&self) -> Element<'_, Message> {
-        let sp = self.demo_spacing;
-        let pd = self.demo_padding;
+        let sp = self.demo.demo_spacing;
+        let pd = self.demo.demo_padding;
 
         // Interactive preview driven by sliders
         let preview: Element<'_, Message> = container(
@@ -124,7 +124,10 @@ impl App {
             text(format!(".spacing({:.0})", sp))
                 .size(self.sz(22))
                 .font(FIRA_MONO),
-            slider(0.0..=40.0, sp, Message::DemoSpacingChanged).width(self.sp(200.0)),
+            slider(0.0..=40.0, sp, |v| Message::Demo(
+                demo::Message::SpacingChanged(v)
+            ))
+            .width(self.sp(200.0)),
         ]
         .spacing(self.sp(12.0))
         .align_y(iced::Alignment::Center);
@@ -133,7 +136,10 @@ impl App {
             text(format!(".padding({:.0})", pd))
                 .size(self.sz(22))
                 .font(FIRA_MONO),
-            slider(0.0..=40.0, pd, Message::DemoPaddingChanged).width(self.sp(200.0)),
+            slider(0.0..=40.0, pd, |v| Message::Demo(
+                demo::Message::PaddingChanged(v)
+            ))
+            .width(self.sp(200.0)),
         ]
         .spacing(self.sp(12.0))
         .align_y(iced::Alignment::Center);

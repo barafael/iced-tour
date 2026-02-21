@@ -3,7 +3,7 @@ use iced::{
     widget::{column, scrollable, space, text, text_input},
 };
 
-use crate::{App, Message, TEXT_SIZE};
+use crate::{App, Message, TEXT_SIZE, demo};
 
 pub const MD_TEXT_INPUT: &str = r#"
 ```rust
@@ -22,12 +22,14 @@ impl App {
                 space().height(self.sp(8.0)),
                 self.md_container(&self.md_text_input),
                 space().height(self.sp(20.0)),
-                text_input("Enter URL (e.g. example.com)", &self.demo_input)
-                    .on_input(Message::DemoInputChanged)
-                    .on_submit(Message::DemoInputSubmitted),
+                text_input("Enter URL (e.g. example.com)", &self.demo.demo_input)
+                    .on_input(|s| Message::Demo(demo::Message::InputChanged(s)))
+                    .on_submit(Message::Demo(demo::Message::InputSubmitted)),
                 space().height(self.sp(12.0)),
-                text!("Input Changed messages: {}", self.input_changes).size(self.sz(TEXT_SIZE)),
-                text!("Input Submitted messages: {}", self.input_submits).size(self.sz(TEXT_SIZE)),
+                text!("Input Changed messages: {}", self.demo.input_changes)
+                    .size(self.sz(TEXT_SIZE)),
+                text!("Input Submitted messages: {}", self.demo.input_submits)
+                    .size(self.sz(TEXT_SIZE)),
             ]
             .spacing(self.sp(8.0)),
         )

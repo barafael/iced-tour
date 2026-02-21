@@ -5,7 +5,7 @@ use iced::{
 };
 use iced_anim::widget::button;
 
-use crate::{App, Message, SUBTITLE_COLOR, TEXT_SIZE};
+use crate::{App, Message, SUBTITLE_COLOR, TEXT_SIZE, theming};
 
 pub const MD_VIEW: &str = r#"
 ```rust
@@ -21,7 +21,7 @@ fn view(&self) -> Element<Message> {
 
 impl App {
     pub fn view_theming_screen(&self) -> Element<'_, Message> {
-        let hover_color = self.hover_color;
+        let hover_color = self.theming.hover_color;
 
         let swatch =
             button(
@@ -30,14 +30,14 @@ impl App {
                     ..Default::default()
                 }),
             )
-            .on_press(Message::OpenColorPicker);
+            .on_press(Message::Theming(theming::Message::OpenColorPicker));
 
         let picker = iced_aw::helpers::color_picker(
-            self.show_color_picker,
-            self.hover_color,
+            self.theming.show_color_picker,
+            self.theming.hover_color,
             swatch,
-            Message::CancelColorPicker,
-            Message::SubmitHoverColor,
+            Message::Theming(theming::Message::CancelColorPicker),
+            |c| Message::Theming(theming::Message::SubmitColor(c)),
         );
 
         let demo_button = button(text("Hover me").size(self.sz(TEXT_SIZE)))
@@ -89,7 +89,9 @@ impl App {
                 space().height(self.sp(20.0)),
                 row![
                     text("Theme:").size(self.sz(TEXT_SIZE)),
-                    pick_list(Theme::ALL, Some(&self.theme), Message::ThemeChanged),
+                    pick_list(Theme::ALL, Some(&self.theming.theme), |t| Message::Theming(
+                        theming::Message::ThemeChanged(t)
+                    )),
                 ]
                 .spacing(self.sp(12.0))
                 .align_y(iced::Alignment::Center),
