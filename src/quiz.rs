@@ -3,7 +3,6 @@ pub struct Quiz {
     answer: Option<u8>,
     http_answer: Option<u8>,
     button_answer: Option<u8>,
-    validation_answer: Option<u8>,
 }
 
 #[derive(Debug, Clone)]
@@ -11,7 +10,6 @@ pub enum Message {
     Answer(u8),
     HttpAnswer(u8),
     ButtonAnswer(u8),
-    ValidationAnswer(u8),
 }
 
 pub enum Action {
@@ -25,7 +23,6 @@ impl Quiz {
             Message::Answer(a) => self.answer = Some(a),
             Message::HttpAnswer(a) => self.http_answer = Some(a),
             Message::ButtonAnswer(a) => self.button_answer = Some(a),
-            Message::ValidationAnswer(a) => self.validation_answer = Some(a),
         }
         Action::None
     }
@@ -40,9 +37,5 @@ impl Quiz {
 
     pub fn button_answer(&self) -> Option<u8> {
         self.button_answer
-    }
-
-    pub fn validation_answer(&self) -> Option<u8> {
-        self.validation_answer
     }
 }

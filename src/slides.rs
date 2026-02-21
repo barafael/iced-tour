@@ -92,14 +92,11 @@ pub enum Slide {
     #[strum(serialize = "19. Quiz: Conditional UI")]
     QuizButton,
 
-    #[strum(serialize = "20. Quiz: Validation Flow")]
-    QuizValidation,
-
     // Recap
-    #[strum(serialize = "21. Key Takeaways")]
+    #[strum(serialize = "20. Key Takeaways")]
     Takeaways,
 
-    #[strum(serialize = "22. Recap")]
+    #[strum(serialize = "21. Recap")]
     Recap,
 }
 

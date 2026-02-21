@@ -320,7 +320,6 @@ impl App {
             Slide::Quiz => slides::quiz::QuizSlides::view_quiz_screen(&self.quiz),
             Slide::QuizHttp => slides::quiz::QuizSlides::view_quiz_http(&self.quiz),
             Slide::QuizButton => slides::quiz::QuizSlides::view_quiz_button(&self.quiz),
-            Slide::QuizValidation => slides::quiz::QuizSlides::view_quiz_validation(&self.quiz),
             Slide::Takeaways => self.recap_slide.view_takeaways(),
             Slide::Recap => self.recap_slide.view_recap(),
         };
