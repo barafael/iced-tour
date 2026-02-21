@@ -1,9 +1,26 @@
+pub mod button;
+pub mod community_widgets;
+pub mod constructors;
+pub mod interactive;
+pub mod intro;
+pub mod layout;
+pub mod message;
+pub mod model;
+pub mod quiz;
+pub mod recap;
+pub mod subscriptions;
+pub mod tasks;
+pub mod text_input;
+pub mod title;
+pub mod update;
+pub mod view;
+
 use rotalubat::Rotalubat;
 use strum::{Display, EnumCount};
 
 #[derive(Clone, Copy, PartialEq, Eq, Default, Display, Rotalubat, EnumCount)]
 #[rotalubat(mode = "clamp")]
-pub enum Screen {
+pub enum Slide {
     #[default]
     #[strum(serialize = "")]
     Title,
@@ -86,12 +103,12 @@ pub enum Screen {
     Recap,
 }
 
-impl Screen {
+impl Slide {
     pub fn is_first(&self) -> bool {
-        *self == Screen::Title
+        *self == Slide::Title
     }
 
     pub fn is_last(&self) -> bool {
-        *self == Screen::Recap
+        *self == Slide::Recap
     }
 }

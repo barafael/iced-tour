@@ -1,6 +1,6 @@
 use iced::{
-    widget::{column, scrollable, space, text, text_input},
     Element,
+    widget::{column, scrollable, space, text, text_input},
 };
 
 use crate::{App, Message, TEXT_SIZE};
@@ -17,7 +17,8 @@ impl App {
     pub fn view_text_input_screen(&self) -> Element<'_, Message> {
         scrollable(
             column![
-                text("The Text Input widget produces messages as the user types.").size(self.sz(TEXT_SIZE)),
+                text("The Text Input widget produces messages as the user types.")
+                    .size(self.sz(TEXT_SIZE)),
                 space().height(self.sp(8.0)),
                 self.md_container(&self.md_text_input),
                 space().height(self.sp(20.0)),

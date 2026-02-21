@@ -1,6 +1,6 @@
 use iced::{
-    widget::{column, row, scrollable, space, text},
     Element,
+    widget::{column, row, scrollable, space, text},
 };
 use iced_anim::widget::button;
 

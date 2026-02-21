@@ -9,11 +9,11 @@ use lucide_icons::{
 };
 use strum::EnumCount;
 
-use crate::screen::Screen;
+use crate::slides::Slide;
+
 use theme::AppTheme;
 
 mod chaos;
-mod screen;
 mod slides;
 mod sliding;
 mod theme;
@@ -34,7 +34,7 @@ pub const INCORRECT_COLOR: Color = Color::from_rgb(0.85, 0.25, 0.25);
 pub const ELM_CIRCLE_OF_LIFE: &[u8] = include_bytes!("../assets/elm.svg");
 
 pub struct App {
-    pub screen: Screen,
+    pub screen: Slide,
     slide_offset: Animated<sliding::SlideOffset>,
     pub page_boop: page_boop::PageBoop,
     pub theme: Theme,
@@ -79,7 +79,7 @@ impl Default for App {
         use slides::*;
 
         Self {
-            screen: Screen::default(),
+            screen: Slide::default(),
             slide_offset: Animated::new(sliding::SlideOffset::settled(), Motion::SNAPPY),
             page_boop: page_boop::PageBoop::with_style(page_boop::StyleConfig {
                 mono_font: FIRA_MONO,
@@ -245,12 +245,12 @@ impl App {
             _ => None,
         });
 
-        let needs_tick = self.screen == Screen::Subscriptions
+        let needs_tick = self.screen == Slide::Subscriptions
             || self.slide_offset.value() != &sliding::SlideOffset::settled();
 
         let term_sub = self.term.subscription().map(Message::TermEvent);
 
-        if self.screen == Screen::Subscriptions {
+        if self.screen == Slide::Subscriptions {
             let tick =
                 iced::time::every(std::time::Duration::from_millis(16)).map(|_| Message::Tick);
             let spawn_timer =
@@ -408,30 +408,30 @@ impl App {
             .color(ORANGE);
 
         let content: Element<Message> = match self.screen {
-            Screen::Title => self.view_title_screen(),
-            Screen::Intro => self.view_intro_screen(),
-            Screen::Model => self.view_model_screen(),
-            Screen::View => self.view_view_screen(),
-            Screen::LayoutRowCol => self.view_layout_row_col_screen(),
-            Screen::LayoutContainer => self.view_layout_container_screen(),
-            Screen::LayoutSpacing => self.view_layout_spacing_screen(),
-            Screen::Button => self.view_button_screen(),
-            Screen::TextInput => self.view_text_input_screen(),
-            Screen::Theming => self.view_theming_screen(),
-            Screen::ThemePicker => self.view_theme_picker_screen(),
-            Screen::Message => self.view_message_screen(),
-            Screen::Constructors => self.view_constructors_screen(),
-            Screen::Update => self.view_update_screen(),
-            Screen::Tasks => self.view_tasks_screen(),
-            Screen::Subscriptions => self.view_subscriptions_screen(),
-            Screen::Interactive => self.view_interactive_screen(),
-            Screen::CommunityWidgets => self.view_community_widgets_screen(),
-            Screen::Quiz => self.view_quiz_screen(),
-            Screen::QuizHttp => self.view_quiz_http_screen(),
-            Screen::QuizButton => self.view_quiz_button_screen(),
-            Screen::QuizValidation => self.view_quiz_validation_screen(),
-            Screen::Takeaways => self.view_takeaways_screen(),
-            Screen::Recap => self.view_recap_screen(),
+            Slide::Title => self.view_title_screen(),
+            Slide::Intro => self.view_intro_screen(),
+            Slide::Model => self.view_model_screen(),
+            Slide::View => self.view_view_screen(),
+            Slide::LayoutRowCol => self.view_layout_row_col_screen(),
+            Slide::LayoutContainer => self.view_layout_container_screen(),
+            Slide::LayoutSpacing => self.view_layout_spacing_screen(),
+            Slide::Button => self.view_button_screen(),
+            Slide::TextInput => self.view_text_input_screen(),
+            Slide::Theming => self.view_theming_screen(),
+            Slide::ThemePicker => self.view_theme_picker_screen(),
+            Slide::Message => self.view_message_screen(),
+            Slide::Constructors => self.view_constructors_screen(),
+            Slide::Update => self.view_update_screen(),
+            Slide::Tasks => self.view_tasks_screen(),
+            Slide::Subscriptions => self.view_subscriptions_screen(),
+            Slide::Interactive => self.view_interactive_screen(),
+            Slide::CommunityWidgets => self.view_community_widgets_screen(),
+            Slide::Quiz => self.view_quiz_screen(),
+            Slide::QuizHttp => self.view_quiz_http_screen(),
+            Slide::QuizButton => self.view_quiz_button_screen(),
+            Slide::QuizValidation => self.view_quiz_validation_screen(),
+            Slide::Takeaways => self.view_takeaways_screen(),
+            Slide::Recap => self.view_recap_screen(),
         };
 
         let nav = self.view_navigation();
@@ -470,7 +470,7 @@ impl App {
             nav_bar
         ];
 
-        if self.screen == Screen::Subscriptions {
+        if self.screen == Slide::Subscriptions {
             let chaos_overlay = canvas(chaos::ChaosOverlay {
                 circles: &self.chaos_circles,
             })
@@ -511,7 +511,7 @@ impl App {
 
         // Slide indicator
         let current = self.screen as usize;
-        let total = Screen::COUNT;
+        let total = Slide::COUNT;
         let slide_indicator = text(format!("{} / {}", current + 1, total))
             .size(self.sz(20))
             .color(SUBTITLE_COLOR);

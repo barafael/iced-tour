@@ -1,6 +1,6 @@
 use iced::{
-    widget::{column, scrollable, space, text},
     Element,
+    widget::{column, scrollable, space, text},
 };
 
 use crate::{App, Message, TEXT_SIZE};

@@ -1,7 +1,7 @@
 use iced::{
     Color, Element, Theme,
-    widget::{column, container, pick_list, row, scrollable, space, text},
     widget::button as iced_button,
+    widget::{column, container, pick_list, row, scrollable, space, text},
 };
 use iced_anim::widget::button;
 
@@ -23,13 +23,14 @@ impl App {
     pub fn view_theming_screen(&self) -> Element<'_, Message> {
         let hover_color = self.hover_color;
 
-        let swatch = button(
-            container(space().width(60).height(40)).style(move |_| container::Style {
-                background: Some(hover_color.into()),
-                ..Default::default()
-            }),
-        )
-        .on_press(Message::OpenColorPicker);
+        let swatch =
+            button(
+                container(space().width(60).height(40)).style(move |_| container::Style {
+                    background: Some(hover_color.into()),
+                    ..Default::default()
+                }),
+            )
+            .on_press(Message::OpenColorPicker);
 
         let picker = iced_aw::helpers::color_picker(
             self.show_color_picker,
@@ -39,19 +40,17 @@ impl App {
             Message::SubmitHoverColor,
         );
 
-        let demo_button = button(
-            text("Hover me").size(self.sz(TEXT_SIZE)),
-        )
-        .on_press(Message::Noop)
-        .padding(self.sp(16.0))
-        .style(move |theme: &Theme, status| match status {
-            iced_button::Status::Hovered => iced_button::Style {
-                background: Some(hover_color.into()),
-                text_color: Color::WHITE,
-                ..iced_button::primary(theme, status)
-            },
-            _ => iced_button::primary(theme, status),
-        });
+        let demo_button = button(text("Hover me").size(self.sz(TEXT_SIZE)))
+            .on_press(Message::Noop)
+            .padding(self.sp(16.0))
+            .style(move |theme: &Theme, status| match status {
+                iced_button::Status::Hovered => iced_button::Style {
+                    background: Some(hover_color.into()),
+                    text_color: Color::WHITE,
+                    ..iced_button::primary(theme, status)
+                },
+                _ => iced_button::primary(theme, status),
+            });
 
         scrollable(
             column![
@@ -60,13 +59,17 @@ impl App {
                 space().height(self.sp(20.0)),
                 row![
                     column![
-                        text("Click to pick a color:").size(self.sz(TEXT_SIZE - 4)).color(SUBTITLE_COLOR),
+                        text("Click to pick a color:")
+                            .size(self.sz(TEXT_SIZE - 4))
+                            .color(SUBTITLE_COLOR),
                         space().height(self.sp(8.0)),
                         picker,
                     ],
                     space().width(self.sp(40.0)),
                     column![
-                        text("Styled button:").size(self.sz(TEXT_SIZE - 4)).color(SUBTITLE_COLOR),
+                        text("Styled button:")
+                            .size(self.sz(TEXT_SIZE - 4))
+                            .color(SUBTITLE_COLOR),
                         space().height(self.sp(8.0)),
                         demo_button,
                     ],
@@ -91,7 +94,9 @@ impl App {
                 .spacing(self.sp(12.0))
                 .align_y(iced::Alignment::Center),
                 space().height(self.sp(24.0)),
-                text("Sample widgets with the current theme:").size(self.sz(TEXT_SIZE - 4)).color(SUBTITLE_COLOR),
+                text("Sample widgets with the current theme:")
+                    .size(self.sz(TEXT_SIZE - 4))
+                    .color(SUBTITLE_COLOR),
                 space().height(self.sp(12.0)),
                 row![
                     button(text("Default").size(self.sz(TEXT_SIZE - 2)))
@@ -124,7 +129,8 @@ impl App {
                 space().height(self.sp(12.0)),
                 self.md_container(&self.md_view),
                 space().height(self.sp(12.0)),
-                text("Notice the method signature: &self (immutable borrow).").size(self.sz(TEXT_SIZE)),
+                text("Notice the method signature: &self (immutable borrow).")
+                    .size(self.sz(TEXT_SIZE)),
                 space().height(self.sp(8.0)),
                 text("The View can read state but never modify it.").size(self.sz(TEXT_SIZE)),
             ]
